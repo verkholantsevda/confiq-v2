@@ -104,15 +104,7 @@
             <template #content>
 
                 <div class="status">
-
-                    <div>🟢 Backend</div>
-
-                    <div>🟢 Database</div>
-
-                    <div>🟢 API</div>
-
-                    <div>🟢 Worker</div>
-
+                    <li>В разработке</li>
                     <Divider />
 
                     <Tag severity="info" :value="t('common.inDevelopment')" />
