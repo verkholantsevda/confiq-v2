@@ -150,6 +150,17 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	claims := identity.GetClaims(r)
+	if claims == nil {
+		httpx.Unauthorized(w)
+		return
+	}
+
+	if claims.UserID == uint(id) {
+		httpx.BadRequest(w, "cannot delete yourself")
+		return
+	}
+
 	if err := h.service.Delete(uint(id)); err != nil {
 		handleError(w, err)
 		return
