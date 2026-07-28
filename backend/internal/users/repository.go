@@ -63,6 +63,17 @@ func (r *Repository) List() ([]User, error) {
 	return users, nil
 }
 
+func (r *Repository) CountConfigurationsByUserID(userID uint) (int64, error) {
+	var count int64
+
+	err := r.db.
+		Table("configs").
+		Where("user_id = ?", userID).
+		Count(&count).Error
+
+	return count, err
+}
+
 func (r *Repository) Update(user *User) error {
 	return r.db.Save(user).Error
 }

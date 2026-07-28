@@ -60,6 +60,34 @@ func (s *Service) List() ([]User, error) {
 	return s.repo.List()
 }
 
+func (s *Service) ListWithConfigurations() ([]UserResponse, error) {
+	users, err := s.repo.List()
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]UserResponse, 0, len(users))
+
+	for _, user := range users {
+		count, err := s.repo.CountConfigurationsByUserID(user.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(result, UserResponse{
+			ID:             user.ID,
+			Username:       user.Username,
+			ConfigLimit:    user.ConfigLimit,
+			GroupID:        user.GroupID,
+			IsAdmin:        user.IsAdmin,
+			CreatedAt:      user.CreatedAt.Format("2006-01-02 15:04:05"),
+			Configurations: int(count),
+		})
+	}
+
+	return result, nil
+}
+
 func (s *Service) Delete(id uint) error {
 	user, err := s.repo.GetByID(id)
 	if err != nil {
