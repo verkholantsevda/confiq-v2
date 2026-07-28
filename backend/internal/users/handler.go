@@ -21,13 +21,13 @@ func NewHandler(service *Service) *Handler {
 }
 
 func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
-	users, err := h.service.List()
+	users, err := h.service.ListWithConfigurations()
 	if err != nil {
 		handleError(w, err)
 		return
 	}
 
-	httpx.OK(w, ToResponseList(users))
+	httpx.OK(w, users)
 }
 
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {

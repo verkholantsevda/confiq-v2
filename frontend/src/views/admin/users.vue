@@ -31,9 +31,11 @@
                 </template>
             </Column>
             <Column field="configs_count" :header="t('pages.users.configs')" sortable />
-
-            <Column field="config_limit" :header="t('pages.users.limit')" sortable />
-
+            <Column
+                field="configurations"
+                :header="t('pages.users.configs')"
+                sortable
+            />
             <Column field="created_at" :header="t('pages.users.created')" sortable>
                 <template #body="{ data }">
                     {{ new Date(data.created_at).toLocaleString() }}

@@ -17,12 +17,13 @@ type UpdateUserRequest struct {
 }
 
 type UserResponse struct {
-	ID          uint   `json:"id"`
-	Username    string `json:"username"`
-	ConfigLimit int    `json:"config_limit"`
-	GroupID     *uint  `json:"group_id"`
-	IsAdmin     bool   `json:"is_admin"`
-	CreatedAt   string `json:"created_at"`
+	ID             uint   `json:"id"`
+	Username       string `json:"username"`
+	ConfigLimit    int    `json:"config_limit"`
+	GroupID        *uint  `json:"group_id"`
+	IsAdmin        bool   `json:"is_admin"`
+	CreatedAt      string `json:"created_at"`
+	Configurations int    `json:"configurations"`
 }
 
 type ChangePasswordRequest struct {

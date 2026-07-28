@@ -17,7 +17,7 @@ export interface User {
     created_at: string;
 
     group?: Group | null;
-    configs_count?: number;
+    configurations: number;
 }
 
 export interface UpdateUserRequest {
