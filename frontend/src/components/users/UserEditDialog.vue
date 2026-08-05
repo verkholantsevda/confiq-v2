@@ -11,7 +11,7 @@
             <div class="form">
 
                 <div class="field">
-                    <label>{{ t("users.username.value") }}</label>
+                    <label>{{ t("dialog.users.username.value") }}</label>
 
                     <InputText
                         v-model="form.username"
@@ -19,12 +19,12 @@
                     />
 
                     <small class="hint">
-                        <label>{{ t("users.username.description") }}</label>
+                        <label>{{ t("dialog.users.username.description") }}</label>
                     </small>
                 </div>
 
                 <div class="field">
-                    <label>{{ t("users.password.edit_description") }}</label>
+                    <label>{{ t("dialog.users.password.value") }}</label>
 
                     <Password
                         v-model="form.password"
@@ -34,12 +34,12 @@
                     />
 
                     <small class="hint">
-                        <label>{{ t("users.password.") }}</label>
+                        <label>{{ t("dialog.users.password.description") }}</label>
                     </small>
                 </div>
 
                 <div class="field">
-                    <label>{{ t("users.configLimit") }}</label>
+                    <label>{{ t("dialog.users.limit_configurations") }}</label>
 
                     <InputNumber
                         v-model="form.config_limit"
@@ -51,7 +51,7 @@
                 </div>
 
                 <div class="field">
-                    <label>{{ t("users.group.value") }}</label>
+                    <label>{{ t("dialog.users.group.value") }}</label>
 
                     <Select
                         v-model="form.group_id"
@@ -74,7 +74,7 @@
                     </Select>
 
                     <small class="hint">
-                        <label>{{ t("users.group.description") }}</label>
+                        <label>{{ t("dialog.users.group.description") }}</label>
                     </small>
                 </div>
 
@@ -88,12 +88,12 @@
                     />
 
                     <label for="is-admin">
-                        Администратор
+                        {{ t("dialog.users.admin.value") }}
                     </label>
                 </div>
 
                 <small class="hint">
-                    <label>{{ t("users.admin.value") }}</label>
+                     <label>{{ t("dialog.users.admin.description") }}</label>
                 </small>
 
             </div>
@@ -101,32 +101,41 @@
             <Card class="info">
 
                 <template #title>
-                    Информация
+                     <label>{{ t("dialog.users.info_title") }}</label>
                 </template>
-
                 <template #content>
 
-                    <h4>Роли пользователей</h4>
+                    <div class="info-section">
 
-                    <ul>
-                        <li>
-                            <strong>Администратор</strong> — Полный доступ к системе
-                        </li>
+                        <label>{{ t("dialog.users.info_hint") }}</label>
 
-                        <li>
-                            <strong>Пользователь</strong> — Создание и управление своими конфигурациями
-                        </li>
-                    </ul>
+                        <div class="info-row">
+                            <strong> <label>{{ t("dialog.users.admin.value") }}</label></strong>
+                            <span> - </span>
+                            <span> <label>{{ t("dialog.users.admin.description") }}</label></span>
+                        </div>
+
+                        <div class="info-row">
+                            <strong>{{ t("dialog.users.user.value") }}</strong>
+                            <span> - </span>
+                            <span>{{ t("dialog.users.user.description") }}</span>
+                        </div>
+
+                    </div>
 
                     <Divider />
 
-                    <h4>Лимиты конфигураций</h4>
+                    <div class="info-section">
 
-                    <ul>
-                        <li>По умолчанию: <b>5</b></li>
-                        <li>Рекомендуется: <b>10–20</b></li>
-                        <li>Максимум: <b>100</b></li>
-                    </ul>
+                        <h4>{{ t("dialog.users.info2_title") }}</h4>
+
+                        <ul>
+                            <li>{{ t("dialog.users.info2_hint") }}</li>
+                            <li>{{ t("dialog.users.info2_hint2") }}</li>
+                            <li>{{ t("dialog.users.info2_hint3") }}</li>
+                        </ul>
+
+                    </div>
 
                 </template>
 
@@ -137,14 +146,14 @@
         <template #footer>
 
             <Button
-                label="Отмена"
+                :label="t('common.cancel')"
                 severity="secondary"
                 outlined
                 @click="emit('update:visible', false)"
             />
 
             <Button
-                label="Сохранить"
+                :label="t('common.save')"
                 icon="pi pi-check"
                 :loading="saving"
                 @click="save"

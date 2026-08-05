@@ -116,7 +116,7 @@ export default {
         users: {
             username: {
                 value: "Username",
-                description: " Min 3 symbols, just latin word, цифры и _ "
+                description: " Min 3 symbols, just latin, numbers and  _ "
             },
             password: {
                 value: "Password",
