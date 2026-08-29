@@ -15,10 +15,6 @@
                 @click="navigate(item.to)"
             />
         </nav>
-
-        <div class="footer">
-            Confiq v0.1
-        </div>
     </aside>
 </template>
 
