@@ -65,7 +65,11 @@ const router = createRouter({
           name: "admin-config-edit",
           component: () => import("@/views/config-edit.vue"),
         },
-
+        {
+          path: "profile",
+          name: "admin-profile",
+          component: () => import("@/views/profile.vue"),
+        },
       ],
     },
     {

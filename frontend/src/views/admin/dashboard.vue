@@ -87,6 +87,10 @@
                         <i class="pi pi-users action-icon" />
                         <div class="action-title">{{ t("menu.users") }}</div>
                     </div>
+                    <div class="action-card secondary" @click="router.push('/admin/profile')">
+                        <i class="pi pi-user action-icon" />
+                        <div class="action-title">{{t('user.quickactions.profile')}}</div>
+                    </div>
 
                 </div>
 

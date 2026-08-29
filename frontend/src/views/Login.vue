@@ -61,7 +61,24 @@
                     />
 
                 </div>
+                <div
+                    v-if="showTotp"
+                    class="field"
+                >
 
+                    <label>
+                        Код из приложения
+                    </label>
+
+                    <input
+                        v-model="totpCode"
+                        type="text"
+                        maxlength="6"
+                        autocomplete="one-time-code"
+                        placeholder="123456"
+                    />
+
+                </div>
                 <Button
                     class="login-button"
                     type="submit"
@@ -80,7 +97,7 @@
             </form>
 
             <div class="version">
-                Confiq v0.1
+                Confiq v0.2
             </div>
 
         </div>
@@ -129,6 +146,8 @@ const auth = useAuthStore();
 
 const username = ref("");
 const password = ref("");
+const totpCode = ref("");
+const showTotp = ref(false);
 
 const loading = ref(false);
 const error = ref("");
@@ -141,6 +160,7 @@ async function onLogin() {
         const result = await login({
             username: username.value,
             password: password.value,
+            totp_code: totpCode.value,
         });
 
         auth.setToken(result.token);
@@ -153,9 +173,24 @@ async function onLogin() {
         } else {
             await router.push("/user");
         }
-    } catch (e) {
+    } catch (e: any) {
         console.error(e);
-        error.value = "Не удалось выполнить вход";
+
+        const message = e?.response?.data?.error;
+
+        if (message === "totp required") {
+            showTotp.value = true;
+            error.value = "Введите код из приложения-аутентификатора";
+            return;
+        }
+
+        if (message === "invalid totp code") {
+            showTotp.value = true;
+            error.value = "Неверный код подтверждения";
+            return;
+        }
+
+        error.value = message ?? "Не удалось выполнить вход";
     } finally {
         loading.value = false;
     }
