@@ -29,6 +29,9 @@ type Config struct {
 	LogLevel string
 
 	EnableSwagger bool
+
+	OTPUserEnabled  bool
+	OTPAdminEnabled bool
 }
 
 func Load() (*Config, error) {
@@ -64,7 +67,9 @@ func Load() (*Config, error) {
 
 		LogLevel: getEnv("LOG_LEVEL", "info"),
 
-		EnableSwagger: getEnv("ENABLE_SWAGGER", "false") == "true",
+		EnableSwagger:   getEnv("ENABLE_SWAGGER", "false") == "true",
+		OTPUserEnabled:  getEnv("OTP_USER", "false") == "true",
+		OTPAdminEnabled: getEnv("OTP_ADMIN", "true") == "true",
 	}
 
 	if cfg.JWTSecret == "" {

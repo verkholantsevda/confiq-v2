@@ -26,7 +26,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := h.service.Login(req.Username, req.Password)
+	token, err := h.service.Login(req.Username, req.Password, req.TOTPCode)
 	if err != nil {
 		handleError(w, err)
 		return
