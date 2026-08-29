@@ -3,6 +3,7 @@ import client from "./client";
 export interface LoginRequest {
     username: string;
     password: string;
+    totp_code?: string
 }
 
 export interface LoginResponse {
