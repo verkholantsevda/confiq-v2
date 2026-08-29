@@ -1,18 +1,24 @@
 package users
 
 import (
+	"confiq/internal/config"
 	"confiq/internal/logger"
 	"confiq/internal/password"
+	"confiq/internal/totp"
 	"errors"
 )
 
 type Service struct {
-	repo *Repository
+	repo     *Repository
+	otpUser  bool
+	otpAdmin bool
 }
 
-func NewService(repo *Repository) *Service {
+func NewService(repo *Repository, cfg *config.Config) *Service {
 	return &Service{
-		repo: repo,
+		repo:     repo,
+		otpUser:  cfg.OTPUserEnabled,
+		otpAdmin: cfg.OTPAdminEnabled,
 	}
 }
 
@@ -205,4 +211,148 @@ func (s *Service) ChangePassword(id uint, currentPassword, newPassword string) e
 	logger.PasswordChanged(user.ID, user.Username)
 	return nil
 
+}
+
+func (s *Service) CanUseTOTP(user *User) bool {
+	if user.IsAdmin {
+		return s.otpAdmin
+	}
+
+	return s.otpUser
+}
+
+func (s *Service) CreateTOTP(id uint) (string, error) {
+
+	user, err := s.repo.GetByID(id)
+	if err != nil {
+		return "", err
+	}
+
+	if user == nil {
+		return "", errors.New("user not found")
+	}
+
+	if !s.CanUseTOTP(user) {
+		if user.IsAdmin {
+			return "", ErrTOTPDisabledForAdmin
+		}
+		return "", ErrTOTPDisabledForUser
+	}
+
+	if user.TotpEnabled {
+		return "", errors.New("totp already enabled")
+	}
+
+	secret, err := totp.GenerateSecret()
+	if err != nil {
+		return "", err
+	}
+
+	user.TotpSecret = secret
+
+	if err := s.repo.Update(user); err != nil {
+		return "", err
+	}
+
+	return secret, nil
+}
+
+func (s *Service) ConfirmTOTP(id uint, code string) error {
+
+	user, err := s.repo.GetByID(id)
+	if err != nil {
+		return err
+	}
+
+	if user == nil {
+		return errors.New("user not found")
+	}
+
+	if user.TotpSecret == "" {
+		return errors.New("totp not initialized")
+	}
+
+	if !totp.Validate(user.TotpSecret, code) {
+		return errors.New("invalid totp code")
+	}
+
+	user.TotpEnabled = true
+
+	return s.repo.Update(user)
+}
+
+func (s *Service) EnableTOTP(id uint) (string, error) {
+
+	user, err := s.repo.GetByID(id)
+	if err != nil {
+		return "", err
+	}
+
+	if user == nil {
+		return "", errors.New("user not found")
+	}
+
+	if !s.CanUseTOTP(user) {
+		if user.IsAdmin {
+			return "", ErrTOTPDisabledForAdmin
+		}
+		return "", ErrTOTPDisabledForUser
+	}
+
+	if user.TotpEnabled {
+		return "", errors.New("totp already enabled")
+	}
+
+	secret, err := totp.GenerateSecret()
+	if err != nil {
+		return "", err
+	}
+
+	user.TotpSecret = secret
+	user.TotpEnabled = true
+
+	if err := s.repo.Update(user); err != nil {
+		return "", err
+	}
+
+	return secret, nil
+}
+
+func (s *Service) DisableTOTP(id uint) error {
+
+	user, err := s.repo.GetByID(id)
+	if err != nil {
+		return err
+	}
+
+	if user == nil {
+		return errors.New("user not found")
+	}
+
+	user.TotpSecret = ""
+	user.TotpEnabled = false
+
+	return s.repo.Update(user)
+}
+
+type TOTPStatus struct {
+	Enabled   bool `json:"enabled"`
+	Available bool `json:"available"`
+}
+
+func (s *Service) GetTOTPStatus(id uint) (*TOTPStatus, error) {
+
+	user, err := s.repo.GetByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if user == nil {
+		return nil, errors.New("user not found")
+	}
+
+	return &TOTPStatus{
+		Enabled:   user.TotpEnabled,
+		Available: s.CanUseTOTP(user),
+	}, nil
 }

@@ -41,7 +41,7 @@ func main() {
 	configRepo := configs.NewRepository(db)
 
 	// Services
-	userService := users.NewService(userRepo)
+	userService := users.NewService(userRepo, cfg)
 	groupService := groups.NewService(
 		groupRepo,
 		endpointRepo,
