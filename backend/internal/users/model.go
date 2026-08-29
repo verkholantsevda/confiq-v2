@@ -10,7 +10,8 @@ type User struct {
 	ConfigLimit int  `gorm:"default:5"`
 	IsAdmin     bool `gorm:"default:false"`
 
-	GroupID *uint
-
-	CreatedAt time.Time
+	GroupID     *uint
+	TotpSecret  string
+	TotpEnabled bool
+	CreatedAt   time.Time
 }

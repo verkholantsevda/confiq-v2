@@ -108,6 +108,10 @@ func (h *Handler) Me(w http.ResponseWriter, r *http.Request) {
 	httpx.OK(w, ToResponse(*user))
 }
 
+type enableTOTPRequest struct {
+	Code string `json:"code"`
+}
+
 func (h *Handler) ChangePassword(w http.ResponseWriter, r *http.Request) {
 
 	claims := identity.GetClaims(r)
@@ -138,6 +142,71 @@ func (h *Handler) ChangePassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	httpx.NoContent(w)
+}
+
+func (h *Handler) TOTPStatus(w http.ResponseWriter, r *http.Request) {
+	claims := identity.GetClaims(r)
+	if claims == nil {
+		httpx.Unauthorized(w)
+		return
+	}
+	status, err := h.service.GetTOTPStatus(claims.UserID)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+	httpx.OK(w, status)
+}
+
+func (h *Handler) SetupTOTP(w http.ResponseWriter, r *http.Request) {
+	claims := identity.GetClaims(r)
+	if claims == nil {
+		httpx.Unauthorized(w)
+		return
+	}
+
+	result, err := h.service.CreateTOTP(claims.UserID)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	httpx.OK(w, map[string]string{
+		"secret": result,
+	})
+}
+
+func (h *Handler) EnableTOTP(w http.ResponseWriter, r *http.Request) {
+	claims := identity.GetClaims(r)
+	if claims == nil {
+		httpx.Unauthorized(w)
+		return
+	}
+	var req enableTOTPRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		httpx.BadRequest(w, httpx.ErrInvalidJSON)
+		return
+	}
+	err := h.service.ConfirmTOTP(claims.UserID, req.Code)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+	httpx.NoContent(w)
+}
+
+func (h *Handler) DisableTOTP(w http.ResponseWriter, r *http.Request) {
+	claims := identity.GetClaims(r)
+	if claims == nil {
+		httpx.Unauthorized(w)
+		return
+	}
+	err := h.service.DisableTOTP(claims.UserID)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
 	httpx.NoContent(w)
 }
 

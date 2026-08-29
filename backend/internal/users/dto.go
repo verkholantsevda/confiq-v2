@@ -24,6 +24,7 @@ type UserResponse struct {
 	IsAdmin        bool   `json:"is_admin"`
 	CreatedAt      string `json:"created_at"`
 	Configurations int    `json:"configurations"`
+	TOTPAvailable  bool   `json:"totp_available"`
 }
 
 type ChangePasswordRequest struct {
