@@ -3,6 +3,7 @@ package auth
 import (
 	"confiq/internal/logger"
 	"confiq/internal/password"
+	"confiq/internal/totp"
 	"confiq/internal/users"
 )
 
@@ -22,7 +23,7 @@ func NewService(
 	}
 }
 
-func (s *Service) Login(username, plainPassword string) (string, error) {
+func (s *Service) Login(username, plainPassword string, totpCode string) (string, error) {
 
 	user, err := s.users.GetByUsername(username)
 	if err != nil {
@@ -35,6 +36,16 @@ func (s *Service) Login(username, plainPassword string) (string, error) {
 
 	if !password.CheckPassword(plainPassword, user.PasswordHash) {
 		return "", ErrInvalidCredentials
+	}
+
+	if s.users.CanUseTOTP(user) && user.TotpEnabled {
+		if totpCode == "" {
+			return "", ErrTOTPRequired
+		}
+
+		if !totp.Validate(user.TotpSecret, totpCode) {
+			return "", ErrInvalidTOTP
+		}
 	}
 
 	token, err := s.jwt.GenerateToken(

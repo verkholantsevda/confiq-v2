@@ -75,6 +75,12 @@ func New(userHandler *users.Handler, groupHandler *groups.Handler, endpointHandl
 				r.Get("/", userHandler.Me)
 				r.Put("/password", userHandler.ChangePassword)
 			})
+			r.Route("/totp", func(r chi.Router) {
+				r.Get("/status", userHandler.TOTPStatus)
+				r.Post("/setup", userHandler.SetupTOTP)
+				r.Post("/enable", userHandler.EnableTOTP)
+				r.Delete("/", userHandler.DisableTOTP)
+			})
 			r.Route("/configs", func(r chi.Router) {
 				r.Get("/", configHandler.List)
 				r.Get("/{id}", configHandler.Get)
