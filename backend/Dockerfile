@@ -26,7 +26,11 @@ RUN apk add --no-cache ca-certificates sqlite-libs
 
 WORKDIR /app
 
+# Копируем бинарник
 COPY --from=builder /app/confiq .
+
+# Копируем папку с миграциями (добавленная строка)
+COPY --from=builder /app/migrations ./migrations
 
 EXPOSE 8089
 

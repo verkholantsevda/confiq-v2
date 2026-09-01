@@ -33,6 +33,16 @@ func main() {
 		return
 	}
 
+	sqlDB, err := db.DB()
+	if err != nil {
+		slog.Error("failed to get sql.DB from gorm", "error", err)
+		return
+	}
+
+	if err := database.RunMigrations(sqlDB); err != nil {
+		slog.Error("failed to apply migrations", "error", err)
+		return
+	}
 	// Repositories
 	userRepo := users.NewRepository(db)
 	groupRepo := groups.NewRepository(db)
