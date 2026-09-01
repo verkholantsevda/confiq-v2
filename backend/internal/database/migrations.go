@@ -10,7 +10,7 @@ import (
 )
 
 func RunMigrations(db *sql.DB) error {
-
+	// Создаём таблицу учёта миграций
 	_, err := db.Exec(`
 		CREATE TABLE IF NOT EXISTS schema_migrations (
 			version INTEGER PRIMARY KEY,
@@ -27,7 +27,6 @@ func RunMigrations(db *sql.DB) error {
 	}
 
 	for _, file := range files {
-
 		filename := filepath.Base(file)
 
 		version, err := strconv.Atoi(strings.Split(filename, "_")[0])
@@ -36,16 +35,13 @@ func RunMigrations(db *sql.DB) error {
 		}
 
 		var count int
-
 		err = db.QueryRow(
 			"SELECT COUNT(*) FROM schema_migrations WHERE version=?",
 			version,
 		).Scan(&count)
-
 		if err != nil {
 			return err
 		}
-
 		if count > 0 {
 			continue
 		}
@@ -62,16 +58,16 @@ func RunMigrations(db *sql.DB) error {
 			return err
 		}
 
-		if _, err = tx.Exec(string(sqlBytes)); err != nil {
+		// ✅ Выполняем весь файл как один оператор (без разбиения по ;)
+		if _, err := tx.Exec(string(sqlBytes)); err != nil {
 			tx.Rollback()
-			return err
+			return fmt.Errorf("failed to execute query in %s: %w", filename, err)
 		}
 
 		_, err = tx.Exec(
 			"INSERT INTO schema_migrations(version) VALUES(?)",
 			version,
 		)
-
 		if err != nil {
 			tx.Rollback()
 			return err
