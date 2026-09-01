@@ -28,6 +28,8 @@ WORKDIR /app
 
 COPY --from=builder /app/confiq .
 
+COPY --from=builder /app/migrations ./migrations
+
 EXPOSE 8089
 
 CMD ["./confiq"]
