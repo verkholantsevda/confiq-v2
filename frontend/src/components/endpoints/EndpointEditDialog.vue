@@ -1,61 +1,70 @@
 <template>
-  <Dialog :visible="visible" @hide="handleCancel" header="Edit Endpoint" :modal="true" :closable="false" class="endpoint-create-dialog">
+  <Dialog
+    :visible="visible"
+    @hide="handleCancel"
+    :header="t('dialog.endpoints.name_dialog_edit')"
+    :modal="true"
+    :closable="false"
+    class="endpoint-create-dialog"
+    maximizable
+    @update:visible="emit('update:visible', $event)"
+  >
     <div class="dialog-content">
       <form @submit.prevent="handleSave" class="form-left">
         <div class="field">
-          <label for="name">Name</label>
-          <InputText id="name" v-model="form.name" required autofocus />
+          <label for="name">{{ t('dialog.endpoints.name') }}</label>
+          <InputText id="name" v-model="form.name" :placeholder="t('dialog.endpoints.name_placeholder')" required autofocus />
         </div>
 
         <div class="field">
-          <label for="address">Address</label>
-          <InputText id="address" v-model="form.address" required />
-          <small class="hint">Enter a valid URL or IP address.</small>
+          <label for="address">{{ t('dialog.endpoints.address') }}</label>
+          <InputText id="address" v-model="form.address" :placeholder="t('dialog.endpoints.address_placeholder')" required />
+          <small class="hint">{{ t('dialog.endpoints.address_hint') }}</small>
         </div>
 
         <div class="field">
-          <label for="port">Port</label>
-          <InputNumber id="port" v-model="form.port" :min="1" :max="65535" showButtons :step="1" required />
-          <small class="hint">Port number between 1 and 65535. Default is 2408.</small>
+          <label for="port">{{ t('dialog.endpoints.port') }}</label>
+          <InputNumber id="port" v-model="form.port" :placeholder="t('dialog.endpoints.port_placeholder')" :min="1" :max="65535" showButtons :step="1" required />
+          <small class="hint">{{ t('dialog.endpoints.port_hint') }}</small>
         </div>
 
         <div class="field">
-          <label for="configTypes">Configuration Types</label>
+          <label for="configTypes">{{ t('dialog.endpoints.configuration_types') }}</label>
           <MultiSelect
             id="configTypes"
             v-model="form.config_type_ids"
             :options="configTypes"
             optionLabel="name"
             optionValue="id"
-            placeholder="Select configuration types"
+            :placeholder="t('dialog.endpoints.config_types_placeholder')"
             display="chip"
             :filter="true"
             :disabled="loadingConfigTypes"
             required
           />
-          <small class="hint">Select one or more configuration types applicable for this endpoint.</small>
+          <small class="hint">{{ t('dialog.endpoints.config_types_hint') }}</small>
         </div>
 
         <div class="field groups-field">
-          <label>Groups</label>
+          <label>{{ t('dialog.endpoints.groups') }}</label>
           <div class="groups-checkboxes">
             <div v-for="group in groups" :key="group.id" class="group-checkbox">
               <Checkbox v-model="form.group_ids" :value="group.id" :inputId="'group-' + group.id" />
               <label :for="'group-' + group.id">{{ group.name }}</label>
             </div>
           </div>
-          <small class="hint">Select groups this endpoint belongs to.</small>
+          <small class="hint">{{ t('dialog.endpoints.groups_hint') }}</small>
         </div>
 
         <div class="dialog-footer">
-          <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="handleCancel" :disabled="loading" />
-          <Button label="Save" icon="pi pi-check" type="submit" :loading="loading" :disabled="loading || !isFormValid" />
+          <Button :label="t('common.cancel')" icon="pi pi-times" class="p-button-text" @click="handleCancel" :disabled="loading" />
+          <Button :label="t('dialog.endpoints.submit')" icon="pi pi-check" type="submit" :loading="loading" :disabled="loading || !isFormValid" />
         </div>
       </form>
 
       <div class="info-right">
         <div class="info-card">
-          <h3>Address Examples</h3>
+          <h3>{{ t('dialog.endpoints.examples_title') }}</h3>
           <ul>
             <li>http://example.com</li>
             <li>https://api.example.com:8080</li>
@@ -65,15 +74,12 @@
         </div>
 
         <div class="info-card">
-          <h3>Configuration Types Explanation</h3>
-          <p>
-            Configuration types determine the protocols and settings the endpoint supports. Select all that apply.
-          </p>
+          <h3>{{ t('dialog.endpoints.config_types_title') }}</h3>
+          <p>{{ t('dialog.endpoints.config_types_description') }}</p>
           <ul>
-            <li><strong>HTTP</strong>: Standard web protocol.</li>
-            <li><strong>MQTT</strong>: Lightweight messaging protocol.</li>
-            <li><strong>CoAP</strong>: Specialized for constrained devices.</li>
-            <li><strong>Custom</strong>: Custom configuration types defined by your organization.</li>
+            <li v-for="configType in configTypes" :key="configType.id">
+              <strong>{{ configType.name }}</strong>
+            </li>
           </ul>
         </div>
       </div>
@@ -83,6 +89,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, watch, computed } from 'vue';
+import { useI18n } from "vue-i18n";
 import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
 import InputNumber from 'primevue/inputnumber';
@@ -93,7 +100,7 @@ import Button from 'primevue/button';
 import { updateEndpoint } from '@/api/endpoints';
 import { getGroups } from '@/api/groups';
 import { getConfigTypes } from '@/api/configTypes';
-
+const { t } = useI18n({ useScope: 'global' });
 interface Group {
   id: number;
   name: string;

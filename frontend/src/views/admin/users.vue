@@ -30,7 +30,7 @@
                     />
                 </template>
             </Column>
-            <Column field="configs_count" :header="t('pages.users.configs')" sortable />
+            <Column field="config_limit" :header="t('pages.users.limit')" sortable />
             <Column
                 field="configurations"
                 :header="t('pages.users.configs')"
