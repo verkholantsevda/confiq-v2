@@ -9,7 +9,7 @@
             <div class="form">
 
                 <div class="field">
-                    <label>{{ t("pages.configtypes_create.name") }}</label>
+                    <label>{{ t("pages.configtypes.name") }}</label>
 
                     <InputText
                         v-model="configType.name"
@@ -18,7 +18,7 @@
                 </div>
 
                 <div class="field">
-                    <label>{{ t("pages.configtypes_create.description") }}</label>
+                    <label>{{ t("pages.configtypes.description_type") }}</label>
 
                     <Textarea
                         v-model="configType.description"
@@ -29,7 +29,7 @@
                 </div>
 
                 <div class="field">
-                    <label>{{ t("pages.configtypes_create.active") }}</label>
+                    <label>{{ t("pages.configtypes.active") }}</label>
 
                     <ToggleSwitch
                         v-model="configType.is_active"
@@ -39,7 +39,7 @@
                 <Divider />
 
                 <div class="field">
-                    <label>{{ t("pages.configtypes_create.template") }}</label>
+                    <label>{{ t("pages.configtypes.template") }}</label>
 
                     <Textarea
                         v-model="configType.config_template"
@@ -53,7 +53,7 @@
                 <Divider />
 
                 <div class="field">
-                    <label>{{ t("pages.configtypes_create.instruction") }}</label>
+                    <label>{{ t("pages.configtypes.instruction") }}</label>
 
                     <Textarea
                         v-model="configType.usage_instructions"
@@ -66,7 +66,7 @@
                 <Divider />
 
                 <div class="field">
-                    <label>{{ t("pages.configtypes_create.links_clients") }} (JSON)</label>
+                    <label>{{ t("pages.configtypes.links_clients") }} (JSON)</label>
 
                     <Textarea
                         v-model="configType.client_links"
@@ -83,7 +83,7 @@
 
                     <Button
                         icon="pi pi-check"
-                        :label="t('pages.configtypes_create.create')"
+                        :label="t('pages.configtypes.create')"
                         :loading="saving"
                         @click="save"
                     />

@@ -2,8 +2,14 @@
     <Dialog
         v-model:visible="visibleModel"
         modal
+        :style="{ width: '62rem' }"
+        :breakpoints="{
+            '1200px': '80vw',
+            '768px': '95vw',
+            '560px': '100vw'
+        }"
+        :maximizable="true"
         :header="t('dialog.groups.name_dialog')"
-        :style="{ width: '650px' }"
     >
         <div class="form">
 
@@ -56,24 +62,26 @@
 
                 <div
                     v-else
-                    class="endpoint-list"
+                    class="endpoints"
                 >
 
                     <div
                         v-for="endpoint in endpoints"
                         :key="endpoint.id"
-                        class="endpoint-item"
+                        class="endpoint-row"
                     >
                         <Checkbox
                             v-model="form.endpoint_ids"
-                            :inputId="'ep-' + endpoint.id"
+                            :input-id="`endpoint-${endpoint.id}`"
                             :value="endpoint.id"
                         />
 
-                        <label :for="'ep-' + endpoint.id">
-                            {{ endpoint.name }}
+                        <label :for="`endpoint-${endpoint.id}`">
+                            <strong>{{ endpoint.name }}</strong>
+                            <span class="address">
+                                {{ endpoint.address }}:{{ endpoint.port }}
+                            </span>
                         </label>
-
                     </div>
 
                 </div>
@@ -85,14 +93,14 @@
             <div class="actions">
 
                 <Button
-                    label="Создать группу"
+                    :label="t('dialog.groups.create')"
                     icon="pi pi-check"
                     :loading="saving"
                     @click="create"
                 />
 
                 <Button
-                    label="Отмена"
+                    :label="t('common.cancel')"
                     icon="pi pi-times"
                     severity="secondary"
                     outlined
@@ -119,7 +127,7 @@ import Checkbox from "primevue/checkbox";
 
 // заменить своими API
 import { createGroup } from "@/api/groups";
-import { getEndpoints } from "@/api/endpoints";
+import { getEndpointsAll } from "@/api/endpoints";
 const { t } = useI18n({
     useScope: "global",
 });
@@ -152,7 +160,7 @@ async function loadEndpoints() {
     loadingEndpoints.value = true;
 
     try {
-        endpoints.value = await getEndpoints();
+        endpoints.value = await getEndpointsAll();
     } finally {
         loadingEndpoints.value = false;
     }
@@ -211,23 +219,30 @@ async function create() {
     font-size: .85rem;
 }
 
-.endpoint-list {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: .75rem 1rem;
-    margin-top: .75rem;
-}
-
-.endpoint-item {
+.endpoints {
     display: flex;
-    align-items: center;
-    gap: .6rem;
-    padding: .35rem 0;
+    flex-direction: column;
+    gap: .75rem;
+    max-height: 260px;
+    overflow-y: auto;
+    padding: .25rem;
 }
 
-.endpoint-item label {
-    font-weight: 400;
+.endpoint-row {
+    display: flex;
+    align-items: flex-start;
+    gap: .75rem;
+}
+
+.endpoint-row label {
+    display: flex;
+    flex-direction: column;
     cursor: pointer;
+}
+
+.address {
+    font-size: .85rem;
+    color: var(--text-color-secondary);
 }
 
 .loading {
@@ -239,6 +254,42 @@ async function create() {
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
+}
+
+:deep(.p-dialog-header-actions .p-dialog-close-button) {
+    border-radius: 0;
+}
+
+:deep(.p-dialog-header-actions .p-dialog-close-button .p-icon) {
+    width: 1rem;
+    height: 1rem;
+}
+
+:deep(.p-dialog-footer) {
+    display: flex;
+    gap: .75rem;
+}
+
+@media (max-width: 600px) {
+    :deep(.p-dialog-footer) {
+        flex-direction: column-reverse;
+    }
+
+    :deep(.p-dialog-footer .p-button) {
+        width: 100%;
+    }
+
+    :deep(.p-dialog-content) {
+        padding: 1rem;
+    }
+
+    :deep(.p-dialog-header) {
+        padding: 1rem;
+    }
+
+    :deep(.p-dialog-footer) {
+        padding: 1rem;
+    }
 }
 
 @media (max-width: 640px) {

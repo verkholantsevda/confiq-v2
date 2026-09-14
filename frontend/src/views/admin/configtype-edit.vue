@@ -10,7 +10,7 @@
             <div class="form">
 
                 <div class="field">
-                    <label>{{ t("configtypes.name") }}</label>
+                    <label>{{ t("pages.configtypes.name") }}</label>
 
                     <InputText
                         v-model="configType.name"
@@ -19,7 +19,7 @@
                 </div>
 
                 <div class="field">
-                    <label>{{ t("configtypes.description") }}</label>
+                    <label>{{ t("pages.configtypes.description_type") }}</label>
 
                     <Textarea
                         v-model="configType.description"
@@ -30,7 +30,7 @@
                 </div>
 
                 <div class="field">
-                    <label>{{ t("configtypes.active") }}</label>
+                    <label>{{ t("pages.configtypes.active") }}</label>
 
                     <ToggleSwitch
                         v-model="configType.is_active"
@@ -40,7 +40,7 @@
                 <Divider />
 
                 <div class="field">
-                    <label>Шаблон конфигурации</label>
+                    <label>{{ t("pages.configtypes.template") }}</label>
 
                     <Textarea
                         v-model="configType.config_template"
@@ -54,7 +54,7 @@
                 <Divider />
 
                 <div class="field">
-                    <label>Инструкция по использованию</label>
+                    <label>{{ t("pages.configtypes.instruction") }}</label>
 
                     <Textarea
                         v-model="configType.usage_instructions"
@@ -67,7 +67,7 @@
                 <Divider />
 
                 <div class="field">
-                    <label>Ссылки на клиенты (JSON)</label>
+                    <label>{{ t("pages.configtypes.links_clients") }}</label>
 
                     <Textarea
                         v-model="configType.client_links"
@@ -84,14 +84,14 @@
 
                     <Button
                         icon="pi pi-check"
-                        label="Сохранить"
+                        :label="t('common.save')"
                         :loading="saving"
                         @click="save"
                     />
 
                     <Button
                         icon="pi pi-times"
-                        label="Отмена"
+                        :label="t('common.cancel')"
                         severity="secondary"
                         outlined
                         @click="router.back()"

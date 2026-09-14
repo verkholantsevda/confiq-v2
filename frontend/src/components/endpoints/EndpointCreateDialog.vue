@@ -1,5 +1,5 @@
 <template>
-  <Dialog 
+  <Dialog
     :visible="visible"
     @hide="handleCancel"
     :header="t('dialog.endpoints.name_dialog')"
@@ -341,15 +341,39 @@ label {
   }
 }
  
-:deep(.p-dialog-header-close),
-:deep(.p-dialog-header-close:hover),
-:deep(.p-dialog-header-maximize),
-:deep(.p-dialog-header-maximize:hover) {
-  border-radius: 50%;
-  width: 2rem;
-  height: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+:deep(.p-dialog-header-actions .p-dialog-close-button) {
+    border-radius: 0;
+}
+
+:deep(.p-dialog-header-actions .p-dialog-close-button .p-icon) {
+    width: 1rem;
+    height: 1rem;
+}
+
+:deep(.p-dialog-footer) {
+    display: flex;
+    gap: .75rem;
+}
+
+@media (max-width: 600px) {
+    :deep(.p-dialog-footer) {
+        flex-direction: column-reverse;
+    }
+
+    :deep(.p-dialog-footer .p-button) {
+        width: 100%;
+    }
+
+    :deep(.p-dialog-content) {
+        padding: 1rem;
+    }
+
+    :deep(.p-dialog-header) {
+        padding: 1rem;
+    }
+
+    :deep(.p-dialog-footer) {
+        padding: 1rem;
+    }
 }
 </style>

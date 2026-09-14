@@ -10,7 +10,8 @@ export default {
         noData: "Нет данных",
         created: "Создана",
         cancel: "Отмена",
-        create: "Создать"
+        create: "Создать",
+        save: "Сохранить",
     },
 
     auth: {
@@ -51,11 +52,28 @@ export default {
         },
         endpoints: {
             description: "Управление точками подключения",
-            create: "Создать точку подключения",
             name: "Имя",
             address: "Адрес",
             port: "Порт",
+            configuration_types: "Типы конфигураций",
             groups: "Группы",
+            name_dialog: "Создать точку подключения",
+            name_dialog_edit: "Редактировать точку подключения",
+            examples_title: "Примеры адресов",
+            config_types_title: "Типы конфигураций",
+            config_types_description: "Выберите, какие типы конфигураций будут доступны для этой точки подключения.",
+            address_hint: "IP-адрес или доменное имя",
+            port_hint: "По умолчанию WARP порт: 2408",
+            config_types_hint: "Доступные типы конфигураций для этой точки подключения (Ctrl+Click для выбора нескольких)",
+            groups_hint: "Группы пользователей, которые могут получить доступ к этой точке подключения. Если группы не выбраны, точка подключения будет доступна всем пользователям.",
+            name_placeholder: "Имя точки подключения",
+            address_placeholder: "Хост или IP-адрес",
+            port_placeholder: "Порт",
+            config_types_placeholder: "Выберите типы конфигураций",
+            create: "Создать точку подключения",
+            submit: "Применить",
+            message_delete: "Вы действительно уверены, что хотите удалить точку подключения?",
+            cant_message_delete: "Это действие нельзя отменить"
         },
         groups: {
             description: "Управление группами",
@@ -71,17 +89,17 @@ export default {
             description_type: "Описание",
             createbutton: "Создать тип конфигурации",
             edit: "Редактирование типа конфигурации",
-            create: "Cоздание типа конфигурации",
-            active: "Статус"
-        },
-        configtypes_create: {
-            name: "Имя",
-            description: "Описание",
             active: "Статус",
             template: "Шаблон конфигурации",
             instruction: "Инструкция по использованию",
             links_clients: "Ссылки на клиенты",
             create: "Cоздать тип конфигурации",
+        },
+        configtypes_create: {
+
+
+            
+
         },
         configs: {
             description: "Управление конфигурациями",
@@ -152,6 +170,7 @@ export default {
             configuration_types: "Типы конфигурации",        
             groups: "Группы",        
             name_dialog: "Создание точки подключения",
+            name_dialog_edit: "Редактировать точку подключения",
             examples_title: "Примеры адресов",
             config_types_title: "Типы конфигураций",
             config_types_description: "Выберите, какие типы конфигураций будут доступны для этой точки подключения.",
@@ -168,6 +187,7 @@ export default {
         },
         groups: {
             name_dialog: "Создать группу",
+            name_edit_dialog: "Редактировать группу",
             name: "Имя",
             name_placeholder: "Название группы",
             name_hint: "Уникальное имя для группы",
@@ -177,6 +197,16 @@ export default {
             endpoints: "Доступные точки подключения",
             endpoints_hint: "Выберите точки подключения",
             users: "Пользователи",
+            create: "Создать группу",
+            submit: "Применить",
+            stats: "Статистика",
+            count_users: "Количество пользователей",
+            count_endpoints: "Количество точек подключения",
+            date_created: "Дата создания",
+            users_groups: "Пользователи группы",
+            no_users: "Нет пользователей в группе",
+            no_endpoints: "Нет доступных точек подключения",
+            message_delete: "Вы действительно уверены, что хотите удалить группу?"
         },
         config: {
             name_dialog: "Создание новой конфигурации",

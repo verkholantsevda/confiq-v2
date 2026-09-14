@@ -77,16 +77,10 @@ export default {
             createbutton: "Create configuration type",
             edit: "Edit configuration type",
             create: "Create configuration type",
-            active: "Status"
-        },
-        configtypes_create: {
-            name: "Name",
-            description: "Description",
             active: "Status",
             template: "Configuration template",
             instruction: "Instructions for use",
             links_clients: "Links apps",
-            create: "Create configuration type",
         },
         configs: {
             description: "Manage configurations",
@@ -157,6 +151,7 @@ export default {
             configuration_types: "Configuration Types",        
             groups: "Groups",
             name_dialog: "Create endpoint",
+            name_dialog_edit: "Edit endpoint",
             examples_title: "Address Examples",
             config_types_title: "Configuration Types",
             config_types_description: "Select which configuration types will be available for this endpoint.",
@@ -169,9 +164,13 @@ export default {
             port_placeholder: "Port",
             config_types_placeholder: "Select configuration types",
             create: "Create Endpoint",
+            submit: "Submit",
+            message_delete: "Are you sure delete endpoint",
+            cant_message_delete: "This action can't cancel"
         },
         groups: {
             name_dialog: "Create group",
+            name_edit_dialog: "Edit group",
             name: "Name",
             name_placeholder: "Group name",
             name_hint: "Uniq name group",
@@ -181,8 +180,16 @@ export default {
             users: "Users",
             endpoints: "Available endpoints",
             endpoints_hint: "Pick endpoints",
-            create: "Create configuration",
-            
+            create: "Create group",
+            submit: "Submit",
+            stats: "Stats",
+            count_users: "Count users",
+            count_endpoints: "Count endpoints",
+            date_created: "Date created",
+            users_groups: "Users of group",
+            no_users: "No users in group",
+            no_endpoints: "No available endpoints",
+            message_delete: "Are you sure delete group",
         },
         config: {
             name_dialog: "Create new configuration",
