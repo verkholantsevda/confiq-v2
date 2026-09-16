@@ -1,7 +1,7 @@
 <template>
     <PageHeader
-        :title="t('users.profile.title')"
-        :subtitle="t('users.profile.subtitle')"
+        :title="t('user.profile.title')"
+        :subtitle="t('user.profile.subtitle')"
     />
 
     <div class="profile-grid">
