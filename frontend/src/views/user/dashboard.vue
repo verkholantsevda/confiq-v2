@@ -54,7 +54,7 @@
     <Card class="usage-card">
 
         <template #title>
-            Использование
+             {{ t("pages.dashboard.use") }}
         </template>
 
         <template #content>
@@ -112,13 +112,10 @@
 
     </Card>
 
-
-
-    <!-- Быстрые действия -->
     <Card class="actions-card">
 
         <template #title>
-            Быстрые действия
+            {{ t("pages.dashboard.quickActions") }}
         </template>
 
 
@@ -129,6 +126,7 @@
                 <Button
                     icon="pi pi-plus"
                     :label="t('user.quickactions.create')"
+                    @click="createConfig"
                 />
 
 
@@ -214,6 +212,10 @@
 
     </div>
 
+    <ConfigCreateDialog
+        v-model="createDialogVisible"
+        @created="load"
+    />
     <ConfigQrCodeDialog
         v-model="qrDialogVisible"
         :config="selectedConfig"
@@ -243,7 +245,13 @@ import { useConfigsView } from "@/composables/useConfigsView";
 
 import { ref } from 'vue';
 import ConfigQrCodeDialog from '@/components/configs/ConfigQrCodeDialog.vue';
+import ConfigCreateDialog from '@/components/configs/ConfigCreateDialog.vue';
 
+const createDialogVisible = ref(false);
+
+function createConfig() {
+    createDialogVisible.value = true;
+}
 
 const router = useRouter();
 

@@ -36,6 +36,7 @@ export default {
             quickActions: "Быстрые действия",
             systemStatus: "Состояние системы",
             recentActivity: "Последняя активность",
+            use: "Использование",
         },
         users: {
             description: "Управление пользователями",
@@ -230,6 +231,8 @@ export default {
             profile: "Профиль"
         },
         profile: {
+            name: "Профиль",
+            subtitle: "Управление информацией об аккаунте",
             title: "Информация об аккаунте",
             user: "Пользователь",
             created: "Регистрация",

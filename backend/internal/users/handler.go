@@ -99,13 +99,13 @@ func (h *Handler) Me(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.service.GetByID(claims.UserID)
+	user, err := h.service.GetMe(claims.UserID)
 	if err != nil {
 		handleError(w, err)
 		return
 	}
 
-	httpx.OK(w, ToResponse(*user))
+	httpx.OK(w, user)
 }
 
 type enableTOTPRequest struct {

@@ -24,12 +24,20 @@
           :disabled="!form.endpoint_id"
         />
       </div>
-      <Card class="limit-card">
+
+      <div class="limit-card">
         <div class="limit-row">
-          Доступно конфигураций: {{ configLimit }}
+          Конфигурации: {{ configsCount }} / {{ configLimit }}
         </div>
-      </Card>
+        <div class="limit-row">
+          Доступно: {{ availableConfigs }}
+        </div>
+      </div>
     </form>
+    <Message severity="warn" :closable="false" class="create-warning">
+      <strong>Важно</strong>
+      <div>Создание занимает время: Процесс может занять 10-30 секунд, так как происходит регистрация в серверной инфраструктуре. Не закрывайте страницу!</div>
+    </Message>
     <template #footer>
       <Button :label="t('common.cancel')" text severity="secondary" @click="visible = false" />
       <Button
@@ -48,9 +56,10 @@ import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 import Select from 'primevue/select';
-import Card from 'primevue/card';
+import Message from 'primevue/message';
 import { getEndpoints, getEndpointConfigTypes } from '@/api/endpoints';
 import { createConfiguration } from '@/api/configs';
+import { me } from '@/api/auth';
 const { t } = useI18n();
 const props = defineProps<{
     modelValue: boolean;
@@ -75,12 +84,18 @@ const form = reactive({
 const endpoints = ref<any[]>([]);
 const configTypes = ref<any[]>([]);
 const configLimit = ref(0);
+const configsCount = ref(0);
+
+const availableConfigs = computed(() => Math.max(0, configLimit.value - configsCount.value));
 
 watch(
   () => visible.value,
   async (open) => {
     if (!open) return;
 
+    const user = await me();
+    configLimit.value = user.config_limit;
+    configsCount.value = user.configurations;
     endpoints.value = await getEndpoints();
     configTypes.value = [];
     form.endpoint_id = null;
@@ -156,4 +171,32 @@ async function submitCreateConfig() {
   align-items: center;
   gap: .5rem;
 }
+.create-warning {
+  margin-top: .5rem;
+}
+
+.create-warning strong {
+  display: block;
+  margin-bottom: .25rem;
+}
+
+.limit-card {
+  margin-top: .5rem;
+  padding: .75rem 1rem;
+  border: 1px solid var(--p-content-border-color);
+  border-radius: var(--p-border-radius-md);
+  background: var(--p-content-background);
+}
+
+.limit-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: .5rem;
+}
+
+.limit-row + .limit-row {
+  margin-top: .4rem;
+}
+
 </style>
