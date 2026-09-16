@@ -1,0 +1,40 @@
+services:
+  backend:
+    env_file:
+      - .env
+    image: dverkholantsev/confiq-v2-backend
+    container_name: confiq-backend
+    restart: unless-stopped
+    expose:
+      - "8089"
+    volumes:
+      - ./backend/data:/app/data
+
+  frontend:
+    env_file:
+      - .env
+    image: dverkholantsev/confiq-v2-frontend
+    build:
+      args:
+        - VITE_DONATE_YOOMONEY_URL
+        - VITE_DONATE_CLOUDTIP_URL
+    container_name: confiq-frontend
+
+    restart: unless-stopped
+
+    expose:
+      - "80"
+
+  proxy:
+    image: nginx:alpine
+    container_name: confiq-proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      - frontend
+      - backend
