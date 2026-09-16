@@ -48,7 +48,7 @@
     </Card>
 
     <div class="configs-toolbar">
-        <span class="p-input-icon-left w-full">
+        <span class="p-input-icon-left search-field">
             <i class="pi pi-search" />
             <InputText
                 v-model="search"
@@ -56,6 +56,11 @@
                 class="w-full"
             />
         </span>
+
+        <div class="my-configs-toggle">
+            <ToggleSwitch v-model="showOnlyMine" inputId="showOnlyMine" />
+            <label for="showOnlyMine">Мои конфигурации</label>
+        </div>
     </div>
 
     <div class="configs-grid">
@@ -71,6 +76,7 @@
             <template #content>
                 <div class="config-info">
                     <div class="info-row"><i class="pi pi-map-marker"></i><span>{{ config.endpoint?.name ?? '-' }}</span></div>
+                    <div class="info-row"><i class="pi pi-user"></i><span>{{ usernamesById.get(config.user_id) ?? '-' }}</span></div>
                     <div class="info-row"><i class="pi pi-globe"></i><span>{{ config.endpoint ? `${config.endpoint.address}:${config.endpoint.port}` : '-' }}</span></div>
                     <div class="info-row"><i class="pi pi-clock"></i><span>{{ new Date(config.created_at).toLocaleString('ru-RU') }}</span></div>
                     <Divider />
@@ -119,11 +125,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useI18n } from "vue-i18n";
 import { useRouter } from 'vue-router';
 
 import Button from "primevue/button";
+import ToggleSwitch from "primevue/toggleswitch";
 import Divider from "primevue/divider";
 import PageHeader from "@/components/common/PageHeader.vue";
 import Card from "primevue/card";
@@ -132,6 +139,7 @@ import ConfigQrCodeDialog from "@/components/configs/ConfigQrCodeDialog.vue";
 
 import { useConfigsView } from '@/composables/useAdminConfigsView';
 import ConfigCreateDialog from "@/components/configs/ConfigCreateDialog.vue";
+import { getUsers } from "@/api/users";
 const DONATE_YOOMONEY_URL = import.meta.env.VITE_DONATE_YOOMONEY_URL ?? '#';
 const DONATE_CLOUDTIP_URL = import.meta.env.VITE_DONATE_CLOUDTIP_URL ?? '#';
 
@@ -144,23 +152,43 @@ const router = useRouter();
 const {
     configs,
     totalConfigs,
+    showOnlyMine,
     load,
 } = useConfigsView();
 
 const search = ref('');
+const users = ref<Array<{ id: number; username: string }>>([]);
+
+const usernamesById = computed(() => {
+    return new Map(users.value.map(user => [user.id, user.username]));
+});
 
 const filteredConfigs = computed(() => {
     const q = search.value.trim().toLowerCase();
+
     if (!q) return configs.value;
 
     return configs.value.filter(config => {
         const configName = config.name?.toLowerCase() ?? '';
         const endpointName = config.endpoint?.name?.toLowerCase() ?? '';
-        return configName.includes(q) || endpointName.includes(q);
+        const username = usernamesById.value.get(config.user_id)?.toLowerCase() ?? '';
+
+        return (
+            configName.includes(q) ||
+            endpointName.includes(q) ||
+            username.includes(q)
+        );
     });
 });
 
-onMounted(load);
+watch(showOnlyMine, async () => {
+    await load();
+});
+
+onMounted(async () => {
+    users.value = await getUsers();
+    await load();
+});
 
 function viewConfig(id: number) {
     router.push({
@@ -248,7 +276,21 @@ function downloadConfig(config:any) {
 }
 
 .configs-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
     margin-bottom: 1rem;
+}
+
+.search-field {
+    flex: 1;
+}
+
+.my-configs-toggle {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    white-space: nowrap;
 }
 
 .configs-grid {
@@ -307,5 +349,6 @@ function downloadConfig(config:any) {
 
 @media (max-width:768px){
 .stats-grid{grid-template-columns:1fr;}
+.configs-toolbar{flex-direction:column;align-items:stretch;}
 }
 </style>

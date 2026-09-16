@@ -28,6 +28,7 @@
                 :options="languages"
                 optionLabel="label"
                 optionValue="value"
+                :allowEmpty="false"
                 size="small"
             />
 

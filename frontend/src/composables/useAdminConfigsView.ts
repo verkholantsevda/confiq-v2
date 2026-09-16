@@ -1,14 +1,18 @@
-// src/composables/useConfigsView.ts
-
-import { computed } from "vue";
+import { computed, ref } from "vue";
 
 import { useConfigurations } from "@/composables/useConfigs";
+import { getUsers } from "@/api/users";
 
 export function useConfigsView() {
     const configurationsStore = useConfigurations();
-    
+    const showOnlyMine = ref(false);
+
     async function load() {
-        await configurationsStore.loadAllConfigurations();
+        if (showOnlyMine.value) {
+            await configurationsStore.loadConfigurations();
+        } else {
+            await configurationsStore.loadAllConfigurations();
+        }
     }
 
     const configs = computed(() => configurationsStore.configurations.value);
@@ -17,7 +21,6 @@ export function useConfigsView() {
 
     const usedConfigs = computed(() => configs.value.length);
 
-    // TODO: replace with the logged-in user's real config limit
     const configLimit = computed(() => 5);
 
     const availableConfigs = computed(
@@ -33,6 +36,7 @@ export function useConfigsView() {
         usedConfigs,
         configLimit,
         availableConfigs,
+        showOnlyMine,
         load,
     };
 }
