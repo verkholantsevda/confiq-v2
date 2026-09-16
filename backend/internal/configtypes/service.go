@@ -1,12 +1,19 @@
 package configtypes
 
+import (
+	"confiq/internal/audit"
+	"log/slog"
+)
+
 type Service struct {
-	repo *Repository
+	repo  *Repository
+	audit *audit.Service
 }
 
-func NewService(repo *Repository) *Service {
+func NewService(repo *Repository, auditService *audit.Service) *Service {
 	return &Service{
-		repo: repo,
+		repo:  repo,
+		audit: auditService,
 	}
 }
 
@@ -23,7 +30,7 @@ func (s *Service) GetByID(id uint) (*ConfigType, error) {
 	return configType, nil
 }
 
-func (s *Service) Create(req CreateConfigTypeRequest) (*ConfigType, error) {
+func (s *Service) Create(actorID uint, req CreateConfigTypeRequest) (*ConfigType, error) {
 
 	existing, err := s.repo.GetByName(req.Name)
 	if err != nil {
@@ -47,10 +54,20 @@ func (s *Service) Create(req CreateConfigTypeRequest) (*ConfigType, error) {
 		return nil, err
 	}
 
+	if err := s.audit.Log(
+		&actorID,
+		"config_type.created",
+		"config_type",
+		&configType.ID,
+		"Создан тип конфигурации "+configType.Name,
+	); err != nil {
+		slog.Error("failed to write audit log", "error", err)
+	}
+
 	return configType, nil
 }
 
-func (s *Service) Update(id uint, req UpdateConfigTypeRequest) (*ConfigType, error) {
+func (s *Service) Update(actorID uint, id uint, req UpdateConfigTypeRequest) (*ConfigType, error) {
 
 	configType, err := s.repo.GetByID(id)
 	if err != nil {
@@ -79,10 +96,20 @@ func (s *Service) Update(id uint, req UpdateConfigTypeRequest) (*ConfigType, err
 		return nil, err
 	}
 
+	if err := s.audit.Log(
+		&actorID,
+		"config_type.updated",
+		"config_type",
+		&configType.ID,
+		"Изменен тип конфигурации "+configType.Name,
+	); err != nil {
+		slog.Error("failed to write audit log", "error", err)
+	}
+
 	return configType, nil
 }
 
-func (s *Service) Delete(id uint) error {
+func (s *Service) Delete(actorID uint, id uint) error {
 
 	configType, err := s.repo.GetByID(id)
 	if err != nil {
@@ -91,6 +118,16 @@ func (s *Service) Delete(id uint) error {
 
 	if err := s.repo.Delete(configType.ID); err != nil {
 		return err
+	}
+
+	if err := s.audit.Log(
+		&actorID,
+		"config_type.deleted",
+		"config_type",
+		&configType.ID,
+		"Удален тип конфигурации "+configType.Name,
+	); err != nil {
+		slog.Error("failed to write audit log", "error", err)
 	}
 
 	return nil

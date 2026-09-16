@@ -38,8 +38,12 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 		httpx.BadRequest(w, httpx.ErrInvalidJSON)
 		return
 	}
-
-	user, err := h.service.CreateUser(req)
+	claims := identity.GetClaims(r)
+	if claims == nil {
+		httpx.Unauthorized(w)
+		return
+	}
+	user, err := h.service.CreateUser(claims.UserID, req)
 	if err != nil {
 		handleError(w, err)
 		return
@@ -82,7 +86,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 		req.IsAdmin = nil
 	}
 
-	user, err := h.service.UpdateUser(uint(id), req)
+	user, err := h.service.UpdateUser(claims.UserID, uint(id), req)
 	if err != nil {
 		handleError(w, err)
 		return
@@ -133,6 +137,7 @@ func (h *Handler) ChangePassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err := h.service.ChangePassword(
+		claims.UserID,
 		claims.UserID,
 		req.CurrentPassword,
 		req.NewPassword,
@@ -230,7 +235,7 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.service.Delete(uint(id)); err != nil {
+	if err := h.service.Delete(claims.UserID, uint(id)); err != nil {
 		handleError(w, err)
 		return
 	}

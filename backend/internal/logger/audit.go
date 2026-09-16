@@ -58,7 +58,7 @@ func ConfigCreated(userID, configID uint, name string) {
 
 func ConfigUpdated(userID, configID uint, name string) {
 	audit(
-		"config.created",
+		"config.updated",
 		"user_id", userID,
 		"config_id", configID,
 		"name", name,

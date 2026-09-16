@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"os"
 
+	"confiq/internal/audit"
 	"confiq/internal/auth"
 	"confiq/internal/configs"
 	"confiq/internal/configtypes"
@@ -17,7 +18,7 @@ import (
 	"github.com/go-chi/cors"
 )
 
-func New(userHandler *users.Handler, groupHandler *groups.Handler, endpointHandler *endpoints.Handler, configHandler *configs.Handler, configTypeHandler *configtypes.Handler, authHandler *auth.Handler, authMiddleware *authmw.Auth) http.Handler {
+func New(userHandler *users.Handler, groupHandler *groups.Handler, endpointHandler *endpoints.Handler, configHandler *configs.Handler, configTypeHandler *configtypes.Handler, authHandler *auth.Handler, auditHandler *audit.Handler, authMiddleware *authmw.Auth) http.Handler {
 	r := chi.NewRouter()
 
 	r.Use(chimiddleware.RequestID)
@@ -99,6 +100,8 @@ func New(userHandler *users.Handler, groupHandler *groups.Handler, endpointHandl
 
 			r.Group(func(r chi.Router) {
 				r.Use(authMiddleware.RequireAdmin)
+
+				r.Get("/activity", auditHandler.List)
 
 				r.Route("/users", func(r chi.Router) {
 					r.Get("/", userHandler.List)

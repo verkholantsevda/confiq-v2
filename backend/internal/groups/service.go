@@ -1,8 +1,10 @@
 package groups
 
 import (
+	"confiq/internal/audit"
 	"confiq/internal/endpoints"
 	"errors"
+	"log/slog"
 
 	"gorm.io/gorm"
 )
@@ -10,15 +12,18 @@ import (
 type Service struct {
 	repo      *Repository
 	endpoints *endpoints.Repository
+	audit     *audit.Service
 }
 
 func NewService(
 	repo *Repository,
 	endpoints *endpoints.Repository,
+	auditService *audit.Service,
 ) *Service {
 	return &Service{
 		repo:      repo,
 		endpoints: endpoints,
+		audit:     auditService,
 	}
 }
 
@@ -35,7 +40,7 @@ func (s *Service) GetByID(id uint) (*Group, error) {
 	return group, nil
 }
 
-func (s *Service) Create(req CreateGroupRequest) (*Group, error) {
+func (s *Service) Create(actorID uint, req CreateGroupRequest) (*Group, error) {
 
 	existing, err := s.repo.GetByName(req.Name)
 	if err != nil {
@@ -68,10 +73,20 @@ func (s *Service) Create(req CreateGroupRequest) (*Group, error) {
 		return nil, err
 	}
 
+	if err := s.audit.Log(
+		&actorID,
+		"group.created",
+		"group",
+		&group.ID,
+		"Создана группа "+group.Name,
+	); err != nil {
+		slog.Error("failed to write audit log", "error", err)
+	}
+
 	return group, nil
 }
 
-func (s *Service) Update(id uint, req UpdateGroupRequest) (*Group, error) {
+func (s *Service) Update(actorID uint, id uint, req UpdateGroupRequest) (*Group, error) {
 
 	group, err := s.repo.GetByID(id)
 	if err != nil {
@@ -114,10 +129,20 @@ func (s *Service) Update(id uint, req UpdateGroupRequest) (*Group, error) {
 		return nil, err
 	}
 
+	if err := s.audit.Log(
+		&actorID,
+		"group.updated",
+		"group",
+		&group.ID,
+		"Изменена группа "+group.Name,
+	); err != nil {
+		slog.Error("failed to write audit log", "error", err)
+	}
+
 	return group, nil
 }
 
-func (s *Service) Delete(id uint) error {
+func (s *Service) Delete(actorID uint, id uint) error {
 
 	group, err := s.repo.GetByID(id)
 	if err != nil {
@@ -130,6 +155,16 @@ func (s *Service) Delete(id uint) error {
 
 	if err := s.repo.Delete(group.ID); err != nil {
 		return err
+	}
+
+	if err := s.audit.Log(
+		&actorID,
+		"group.deleted",
+		"group",
+		&group.ID,
+		"Удалена группа "+group.Name,
+	); err != nil {
+		slog.Error("failed to write audit log", "error", err)
 	}
 
 	return nil

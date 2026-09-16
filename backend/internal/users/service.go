@@ -1,28 +1,32 @@
 package users
 
 import (
+	"confiq/internal/audit"
 	"confiq/internal/config"
 	"confiq/internal/logger"
 	"confiq/internal/password"
 	"confiq/internal/totp"
 	"errors"
+	"log/slog"
 )
 
 type Service struct {
 	repo     *Repository
+	audit    *audit.Service
 	otpUser  bool
 	otpAdmin bool
 }
 
-func NewService(repo *Repository, cfg *config.Config) *Service {
+func NewService(repo *Repository, cfg *config.Config, auditService *audit.Service) *Service {
 	return &Service{
 		repo:     repo,
+		audit:    auditService,
 		otpUser:  cfg.OTPUserEnabled,
 		otpAdmin: cfg.OTPAdminEnabled,
 	}
 }
 
-func (s *Service) CreateUser(req CreateUserRequest) (*User, error) {
+func (s *Service) CreateUser(actorID uint, req CreateUserRequest) (*User, error) {
 
 	existing, err := s.repo.GetByUsername(req.Username)
 	if err != nil {
@@ -50,8 +54,18 @@ func (s *Service) CreateUser(req CreateUserRequest) (*User, error) {
 		return nil, err
 	}
 	logger.UserCreated(user.ID, user.Username)
-	return user, nil
 
+	if err := s.audit.Log(
+		&actorID,
+		"user.created",
+		"user",
+		&user.ID,
+		"Создан пользователь "+user.Username,
+	); err != nil {
+		slog.Error("failed to write audit log", "error", err)
+	}
+
+	return user, nil
 }
 
 func (s *Service) GetByID(id uint) (*User, error) {
@@ -115,7 +129,7 @@ func (s *Service) ListWithConfigurations() ([]UserResponse, error) {
 	return result, nil
 }
 
-func (s *Service) Delete(id uint) error {
+func (s *Service) Delete(actorID uint, id uint) error {
 	user, err := s.repo.GetByID(id)
 	if err != nil {
 		return err
@@ -129,10 +143,20 @@ func (s *Service) Delete(id uint) error {
 	}
 
 	logger.UserDeleted(user.ID, user.Username)
+	if err := s.audit.Log(
+		&actorID,
+		"user.deleted",
+		"user",
+		&user.ID,
+		"Удален пользователь "+user.Username,
+	); err != nil {
+		slog.Error("failed to write audit log", "error", err)
+	}
+
 	return nil
 }
 
-func (s *Service) UpdateUser(id uint, req UpdateUserRequest) (*User, error) {
+func (s *Service) UpdateUser(actorID uint, id uint, req UpdateUserRequest) (*User, error) {
 	user, err := s.repo.GetByID(id)
 	if err != nil {
 		return nil, err
@@ -176,6 +200,17 @@ func (s *Service) UpdateUser(id uint, req UpdateUserRequest) (*User, error) {
 		return nil, err
 	}
 	logger.UserUpdated(user.ID, user.Username)
+
+	if err := s.audit.Log(
+		&actorID,
+		"user.updated",
+		"user",
+		&user.ID,
+		"Изменен пользователь "+user.Username,
+	); err != nil {
+		slog.Error("failed to write audit log", "error", err)
+	}
+
 	return user, nil
 }
 
@@ -201,7 +236,7 @@ func (s *Service) EnsureAdmin(username, passwordHash string) error {
 	})
 }
 
-func (s *Service) ChangePassword(id uint, currentPassword, newPassword string) error {
+func (s *Service) ChangePassword(actorID uint, id uint, currentPassword, newPassword string) error {
 
 	user, err := s.repo.GetByID(id)
 
@@ -230,6 +265,17 @@ func (s *Service) ChangePassword(id uint, currentPassword, newPassword string) e
 	}
 
 	logger.PasswordChanged(user.ID, user.Username)
+
+	if err := s.audit.Log(
+		&actorID,
+		"user.password_changed",
+		"user",
+		&user.ID,
+		"Изменен пароль пользователя "+user.Username,
+	); err != nil {
+		slog.Error("failed to write audit log", "error", err)
+	}
+
 	return nil
 
 }

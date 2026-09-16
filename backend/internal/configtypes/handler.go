@@ -2,6 +2,7 @@ package configtypes
 
 import (
 	"confiq/internal/httpx"
+	"confiq/internal/identity"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -55,7 +56,13 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	configType, err := h.service.Create(req)
+	claims := identity.GetClaims(r)
+	if claims == nil {
+		httpx.Unauthorized(w)
+		return
+	}
+
+	configType, err := h.service.Create(claims.UserID, req)
 	if err != nil {
 		handleError(w, err)
 		return
@@ -73,6 +80,12 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	claims := identity.GetClaims(r)
+	if claims == nil {
+		httpx.Unauthorized(w)
+		return
+	}
+
 	var req UpdateConfigTypeRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -80,7 +93,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	configType, err := h.service.Update(uint(id), req)
+	configType, err := h.service.Update(claims.UserID, uint(id), req)
 	if err != nil {
 		handleError(w, err)
 		return
@@ -98,7 +111,13 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.service.Delete(uint(id)); err != nil {
+	claims := identity.GetClaims(r)
+	if claims == nil {
+		httpx.Unauthorized(w)
+		return
+	}
+
+	if err := h.service.Delete(claims.UserID, uint(id)); err != nil {
 		handleError(w, err)
 		return
 	}
