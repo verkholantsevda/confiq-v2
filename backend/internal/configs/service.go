@@ -1,15 +1,19 @@
 package configs
 
 import (
+	"confiq/internal/audit"
 	"confiq/internal/configtypes"
 	"confiq/internal/endpoints"
 	"confiq/internal/logger"
 	"confiq/internal/users"
 	"confiq/internal/warp"
+	"log/slog"
 )
 
 type Service struct {
 	repo *Repository
+
+	audit *audit.Service
 
 	users       *users.Repository
 	endpoints   *endpoints.Repository
@@ -23,9 +27,12 @@ func NewService(
 	endpoints *endpoints.Repository,
 	configTypes *configtypes.Repository,
 	generator *warp.Generator,
+	auditService *audit.Service,
 ) *Service {
 	return &Service{
 		repo: repo,
+
+		audit: auditService,
 
 		users:       users,
 		endpoints:   endpoints,
@@ -34,9 +41,9 @@ func NewService(
 	}
 }
 
-func (s *Service) Create(userID uint, req CreateConfigRequest) (*Config, error) {
+func (s *Service) Create(actorID uint, req CreateConfigRequest) (*Config, error) {
 	// Проверяем пользователя
-	if _, err := s.users.GetByID(userID); err != nil {
+	if _, err := s.users.GetByID(actorID); err != nil {
 		return nil, users.ErrUserNotFound
 	}
 
@@ -85,7 +92,7 @@ func (s *Service) Create(userID uint, req CreateConfigRequest) (*Config, error) 
 
 	config := &Config{
 		Name:         req.Name,
-		UserID:       userID,
+		UserID:       actorID,
 		EndpointID:   req.EndpointID,
 		ConfigTypeID: req.ConfigTypeID,
 
@@ -108,6 +115,15 @@ func (s *Service) Create(userID uint, req CreateConfigRequest) (*Config, error) 
 	}
 
 	logger.ConfigCreated(config.UserID, config.ID, config.Name)
+	if err := s.audit.Log(
+		&actorID,
+		"config.created",
+		"config",
+		&config.ID,
+		"Создана конфигурация "+config.Name,
+	); err != nil {
+		slog.Error("failed to write audit log", "error", err)
+	}
 	return config, nil
 }
 
@@ -132,13 +148,13 @@ func (s *Service) GetByID(id uint, userID uint, isAdmin bool) (*Config, error) {
 	return config, nil
 }
 
-func (s *Service) Update(id uint, userID uint, isAdmin bool, req UpdateConfigRequest) (*Config, error) {
+func (s *Service) Update(id uint, actorID uint, isAdmin bool, req UpdateConfigRequest) (*Config, error) {
 	config, err := s.repo.GetByID(id)
 	if err != nil {
 		return nil, ErrConfigNotFound
 	}
 
-	if !isAdmin && config.UserID != userID {
+	if !isAdmin && config.UserID != actorID {
 		return nil, ErrConfigNotFound
 	}
 
@@ -149,16 +165,25 @@ func (s *Service) Update(id uint, userID uint, isAdmin bool, req UpdateConfigReq
 	}
 
 	logger.ConfigUpdated(config.UserID, config.ID, config.Name)
+	if err := s.audit.Log(
+		&actorID,
+		"config.updated",
+		"config",
+		&config.ID,
+		"Изменена конфигурация "+config.Name,
+	); err != nil {
+		slog.Error("failed to write audit log", "error", err)
+	}
 	return config, nil
 }
 
-func (s *Service) Delete(id uint, userID uint, isAdmin bool) error {
+func (s *Service) Delete(id uint, actorID uint, isAdmin bool) error {
 	config, err := s.repo.GetByID(id)
 	if err != nil {
 		return ErrConfigNotFound
 	}
 
-	if !isAdmin && config.UserID != userID {
+	if !isAdmin && config.UserID != actorID {
 		return ErrConfigNotFound
 	}
 
@@ -171,5 +196,14 @@ func (s *Service) Delete(id uint, userID uint, isAdmin bool) error {
 	}
 
 	logger.ConfigDeleted(config.UserID, config.ID)
+	if err := s.audit.Log(
+		&actorID,
+		"config.deleted",
+		"config",
+		&config.ID,
+		"Удалена конфигурация "+config.Name,
+	); err != nil {
+		slog.Error("failed to write audit log", "error", err)
+	}
 	return nil
 }

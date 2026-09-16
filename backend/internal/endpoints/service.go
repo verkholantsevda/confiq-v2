@@ -1,15 +1,21 @@
 package endpoints
 
 import (
+	"confiq/internal/audit"
 	"confiq/internal/configtypes"
+	"log/slog"
 )
 
 type Service struct {
-	repo *Repository
+	repo  *Repository
+	audit *audit.Service
 }
 
-func NewService(repo *Repository) *Service {
-	return &Service{repo: repo}
+func NewService(repo *Repository, auditService *audit.Service) *Service {
+	return &Service{
+		repo:  repo,
+		audit: auditService,
+	}
 }
 
 func (s *Service) List() ([]Endpoint, error) {
@@ -38,7 +44,7 @@ func (s *Service) GetByID(id uint) (*Endpoint, error) {
 	return endpoint, nil
 }
 
-func (s *Service) Create(req CreateEndpointRequest) (*Endpoint, error) {
+func (s *Service) Create(actorID uint, req CreateEndpointRequest) (*Endpoint, error) {
 	endpoint := &Endpoint{
 		Name:    req.Name,
 		Address: req.Address,
@@ -61,10 +67,20 @@ func (s *Service) Create(req CreateEndpointRequest) (*Endpoint, error) {
 		return nil, err
 	}
 
+	if err := s.audit.Log(
+		&actorID,
+		"endpoint.created",
+		"endpoint",
+		&endpoint.ID,
+		"Создан endpoint "+endpoint.Name,
+	); err != nil {
+		slog.Error("failed to write audit log", "error", err)
+	}
+
 	return endpoint, nil
 }
 
-func (s *Service) Update(id uint, req UpdateEndpointRequest) (*Endpoint, error) {
+func (s *Service) Update(actorID uint, id uint, req UpdateEndpointRequest) (*Endpoint, error) {
 	endpoint, err := s.repo.GetByID(id)
 	if err != nil {
 		return nil, err
@@ -94,10 +110,20 @@ func (s *Service) Update(id uint, req UpdateEndpointRequest) (*Endpoint, error) 
 		return nil, err
 	}
 
+	if err := s.audit.Log(
+		&actorID,
+		"endpoint.updated",
+		"endpoint",
+		&endpoint.ID,
+		"Изменен endpoint "+endpoint.Name,
+	); err != nil {
+		slog.Error("failed to write audit log", "error", err)
+	}
+
 	return endpoint, nil
 }
 
-func (s *Service) Delete(id uint) error {
+func (s *Service) Delete(actorID uint, id uint) error {
 	endpoint, err := s.repo.GetByID(id)
 	if err != nil {
 		return err
@@ -109,6 +135,16 @@ func (s *Service) Delete(id uint) error {
 
 	if err := s.repo.Delete(endpoint.ID); err != nil {
 		return err
+	}
+
+	if err := s.audit.Log(
+		&actorID,
+		"endpoint.deleted",
+		"endpoint",
+		&endpoint.ID,
+		"Удален endpoint "+endpoint.Name,
+	); err != nil {
+		slog.Error("failed to write audit log", "error", err)
 	}
 
 	return nil

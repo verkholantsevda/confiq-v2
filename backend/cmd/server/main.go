@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"net/http"
 
+	"confiq/internal/audit"
 	"confiq/internal/auth"
 	"confiq/internal/config"
 	"confiq/internal/configs"
@@ -49,15 +50,18 @@ func main() {
 	endpointRepo := endpoints.NewRepository(db)
 	configTypeRepo := configtypes.NewRepository(db)
 	configRepo := configs.NewRepository(db)
+	auditRepo := audit.NewRepository(db)
+	auditService := audit.NewService(auditRepo)
 
 	// Services
-	userService := users.NewService(userRepo, cfg)
+	userService := users.NewService(userRepo, cfg, auditService)
 	groupService := groups.NewService(
 		groupRepo,
 		endpointRepo,
+		auditService,
 	)
-	endpointService := endpoints.NewService(endpointRepo)
-	configTypeService := configtypes.NewService(configTypeRepo)
+	endpointService := endpoints.NewService(endpointRepo, auditService)
+	configTypeService := configtypes.NewService(configTypeRepo, auditService)
 	generator := warp.NewGenerator()
 	configService := configs.NewService(
 		configRepo,
@@ -65,6 +69,7 @@ func main() {
 		endpointRepo,
 		configTypeRepo,
 		generator,
+		auditService,
 	)
 	hash, err := password.HashPassword(cfg.AdminPassword)
 	if err != nil {
@@ -77,7 +82,7 @@ func main() {
 		return
 	}
 	jwtService := auth.NewJWT(cfg.JWTSecret, cfg.JWTExpire)
-	authService := auth.NewService(userService, jwtService)
+	authService := auth.NewService(userService, jwtService, auditService)
 
 	// Handlers
 	userHandler := users.NewHandler(userService)
@@ -86,11 +91,12 @@ func main() {
 	configTypeHandler := configtypes.NewHandler(configTypeService)
 	configHandler := configs.NewHandler(configService)
 	authHandler := auth.NewHandler(authService)
+	auditHandler := audit.NewHandler(auditService)
 
 	authMiddleware := middleware.NewAuth(jwtService)
 
 	// Router
-	r := router.New(userHandler, groupHandler, endpointHandler, configHandler, configTypeHandler, authHandler, authMiddleware)
+	r := router.New(userHandler, groupHandler, endpointHandler, configHandler, configTypeHandler, authHandler, auditHandler, authMiddleware)
 
 	server := &http.Server{
 		Addr:    fmt.Sprintf("%s:%s", cfg.Host, cfg.Port),

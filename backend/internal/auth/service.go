@@ -1,25 +1,30 @@
 package auth
 
 import (
+	"confiq/internal/audit"
 	"confiq/internal/logger"
 	"confiq/internal/password"
 	"confiq/internal/totp"
 	"confiq/internal/users"
+	"log/slog"
 )
 
 type Service struct {
 	users *users.Service
 	jwt   *JWT
+	audit *audit.Service
 }
 
 func NewService(
 	usersService *users.Service,
 	jwt *JWT,
+	auditService *audit.Service,
 ) *Service {
 
 	return &Service{
 		users: usersService,
 		jwt:   jwt,
+		audit: auditService,
 	}
 }
 
@@ -57,5 +62,14 @@ func (s *Service) Login(username, plainPassword string, totpCode string) (string
 		return "", err
 	}
 	logger.UserLogin(user.ID, user.Username)
+	if err := s.audit.Log(
+		&user.ID,
+		"auth.login",
+		"user",
+		&user.ID,
+		"Выполнен вход пользователя "+user.Username,
+	); err != nil {
+		slog.Error("failed to write audit log", "error", err)
+	}
 	return token, nil
 }

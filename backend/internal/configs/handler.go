@@ -1,8 +1,6 @@
 package configs
 
-import (
-	"net/http"
-)
+import "net/http"
 
 type Handler struct {
 	service *Service

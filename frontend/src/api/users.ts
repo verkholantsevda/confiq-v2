@@ -7,6 +7,21 @@ export async function getUsers() {
     return data;
 }
 
+export interface Activity {
+    id: number;
+    user_id: number | null;
+    action: string;
+    entity_type: string;
+    entity_id: number | null;
+    message: string;
+    created_at: string;
+}
+
+export async function getActivity(limit = 10) {
+    const { data } = await api.get<Activity[]>(`/activity?limit=${limit}`);
+    return data;
+}
+
 export async function getUser(id: number) {
     const { data } = await api.get<User>(`/users/${id}`);
 
