@@ -58,6 +58,27 @@ func (s *Service) GetByID(id uint) (*User, error) {
 	return s.repo.GetByID(id)
 }
 
+func (s *Service) GetMe(id uint) (*UserResponse, error) {
+	user, err := s.repo.GetByID(id)
+	if err != nil {
+		return nil, err
+	}
+	if user == nil {
+		return nil, nil
+	}
+
+	count, err := s.repo.CountConfigurationsByUserID(user.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	response := ToResponse(*user)
+	response.Configurations = int(count)
+	response.TOTPAvailable = s.CanUseTOTP(user)
+
+	return &response, nil
+}
+
 func (s *Service) GetByUsername(username string) (*User, error) {
 	return s.repo.GetByUsername(username)
 }

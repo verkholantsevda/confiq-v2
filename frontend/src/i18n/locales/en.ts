@@ -10,7 +10,8 @@ export default {
         noData: "No data",
         cancel: "Cancel",
         create: "Create",
-        created: "Created"
+        created: "Created",
+        save: "Save",
     },
 
     auth: {
@@ -36,6 +37,7 @@ export default {
             quickActions: "Quick actions",
             systemStatus: "System status",
             recentActivity: "Recent activity",
+            use: "Usage",
         },
         users: {
             description: "Manage users",
@@ -212,6 +214,8 @@ export default {
             profile: "Profile"
         },
         profile: {
+            name: "Profile",
+            subtitle: "Manage your account information",
             title: "Information profile",
             user: "User",
             created: "Created by",

@@ -1,4 +1,5 @@
 import client from "./client";
+import type { User } from "@/types/user";
 
 export interface LoginRequest {
     username: string;
@@ -15,12 +16,8 @@ export async function login(data: LoginRequest) {
     return response.data;
 }
 
-export interface MeResponse {
-    id: number;
-    username: string;
-    config_limit: number;
-    group_id: number | null;
-    is_admin: boolean;
+export interface MeResponse extends User {
+    totp_available: boolean;
 }
 
 export async function me() {
