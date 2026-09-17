@@ -96,12 +96,6 @@ export default {
             links_clients: "Ссылки на клиенты",
             create: "Cоздать тип конфигурации",
         },
-        configtypes_create: {
-
-
-            
-
-        },
         configs: {
             description: "Управление конфигурациями",
             create: "Создать конфигурацию",
@@ -117,6 +111,7 @@ export default {
             created: "Создан",
             configs: "Содержимое конфигурации",
             copy: "Копировать",
+            copied: "Скопировано",
             download: "Скачать",
             detail: "Детали подключения",
             address: "адрес",
