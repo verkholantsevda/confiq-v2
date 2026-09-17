@@ -99,6 +99,7 @@ export default {
             created: "Created",
             configs: "Configuration content",
             copy: "Copy",
+            copied: "Copied",
             download: "Download",
             detail: "Connection details",
             address: "address",

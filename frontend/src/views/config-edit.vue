@@ -60,8 +60,14 @@
 
                 <template #title>
                     <div class="section-header">
-                      <span>{{ t("pages.configs_edit.configs") }}</span>
-                      <Button icon="pi pi-copy" :label="t('pages.configs_edit.copy')" text size="small" />
+                        <span>{{ t("pages.configs_edit.configs") }}</span>
+                        <Button
+                            :icon="copied ? 'pi pi-check' : 'pi pi-copy'"
+                            :label="copied ? t('pages.configs_edit.copied') : t('pages.configs_edit.copy')"
+                            text
+                            size="small"
+                            @click="copyConfiguration"
+                        />
                     </div>
                 </template>
 
@@ -274,6 +280,7 @@ import PageHeader from "@/components/common/PageHeader.vue";
 import type { Configuration } from "@/types/config";
 
 import { useConfigurations } from "@/composables/useConfigs";
+const copied = ref(false);
 const { t } = useI18n({
     useScope: "global",
 });
@@ -369,6 +376,38 @@ function formatDate(date?: string) {
         minute: "2-digit",
     });
 }
+
+async function copyConfiguration() {
+    const content = config.value?.config_content;
+
+    if (!content) return;
+
+    try {
+        if (navigator.clipboard) {
+            await navigator.clipboard.writeText(content);
+        } else {
+            const textarea = document.createElement('textarea');
+            textarea.value = content;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+
+            document.body.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
+            document.execCommand('copy');
+            textarea.remove();
+        }
+
+        copied.value = true;
+
+        setTimeout(() => {
+            copied.value = false;
+        }, 2000);
+    } catch (error) {
+        console.error('Не удалось скопировать конфигурацию:', error);
+    }
+}
+
 </script>
 <style scoped>
 .page-grid {
