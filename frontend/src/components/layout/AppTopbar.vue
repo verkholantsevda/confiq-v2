@@ -34,9 +34,16 @@
 
             <Divider layout="vertical" />
 
-            <span v-if="username" class="username">
+            <button
+                v-if="username"
+                type="button"
+                class="username"
+                :title="t('user.quickactions.profile')"
+                :aria-label="t('user.quickactions.profile')"
+                @click="openProfile"
+            >
                 {{ username }}
-            </span>
+            </button>
 
             <Button
                 icon="pi pi-sign-out"
@@ -96,6 +103,10 @@ const auth = useAuthStore();
 
 const username = computed(() => auth.user?.username ?? '');
 
+function openProfile() {
+    router.push(auth.isAdmin ? "/admin/profile" : "/user/profile");
+}
+
 function logout() {
     auth.logout();
     router.push("/login");
@@ -122,7 +133,23 @@ function logout() {
 }
 
 .username {
+    font: inherit;
     font-weight: 500;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+}
+
+.username:hover {
+    color: var(--p-primary-color);
+}
+
+.username:focus-visible {
+    outline: 2px solid var(--p-primary-color);
+    outline-offset: 2px;
+    border-radius: 4px;
 }
 .left {
     display: flex;
