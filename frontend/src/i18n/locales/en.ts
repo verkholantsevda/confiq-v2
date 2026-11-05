@@ -105,7 +105,8 @@ export default {
             address: "address",
             instruction: "Instructions for use",
             clients: "App links",
-            QR_Code: "Scan QR Code in App"
+            QR_Code: "Scan QR Code in App",
+            QR_Text: "Configuration too big for generate QR Code. Download file and import to app"
         },
     },
     dialog: {

@@ -165,7 +165,7 @@
 
                     <div class="qr-block" v-else>
                         <p class="qr-text">
-                            Конфигурация слишком большая для удобного сканирования. Скачайте файл и импортируйте его в приложение.
+                            {{ t("pages.configs_edit.QR_Text") }}
                         </p>
 
                         <Button
