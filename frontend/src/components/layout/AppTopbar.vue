@@ -40,18 +40,14 @@
                 class="username"
                 :title="t('user.quickactions.profile')"
                 :aria-label="t('user.quickactions.profile')"
-                @click="openProfile"
+                @click="toggleUserMenu"
             >
-                {{ username }}
+                <i class="pi pi-user"></i>
+                <span>{{ username }}</span>
+                <i class="pi pi-chevron-down"></i>
             </button>
 
-            <Button
-                icon="pi pi-sign-out"
-                text
-                rounded
-                severity="danger"
-                @click="logout"
-            />
+            <Menu ref="userMenu" :model="menuItems" popup />
 
         </div>
 
@@ -59,10 +55,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 
 import Button from "primevue/button";
 import Divider from "primevue/divider";
+import Menu from "primevue/menu";
 import SelectButton from "primevue/selectbutton";
 
 import { useRouter } from "vue-router";
@@ -103,6 +100,21 @@ const auth = useAuthStore();
 
 const username = computed(() => auth.user?.username ?? '');
 
+const userMenu = ref<InstanceType<typeof Menu> | null>(null);
+
+const menuItems = computed(() => [
+    {
+        label: t("user.quickactions.profile"),
+        icon: "pi pi-user",
+        command: openProfile,
+    },
+    {
+        label: t("common.logout"),
+        icon: "pi pi-sign-out",
+        command: logout,
+    },
+]);
+
 function openProfile() {
     router.push(auth.isAdmin ? "/admin/profile" : "/user/profile");
 }
@@ -110,6 +122,10 @@ function openProfile() {
 function logout() {
     auth.logout();
     router.push("/login");
+}
+
+function toggleUserMenu(event: Event) {
+    userMenu.value?.toggle(event);
 }
 </script>
 
@@ -133,6 +149,9 @@ function logout() {
 }
 
 .username {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
     font: inherit;
     font-weight: 500;
     color: inherit;

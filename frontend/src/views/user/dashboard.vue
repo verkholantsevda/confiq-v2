@@ -193,6 +193,7 @@
                         @click="openConfig(config.id)"
                     />
                     <Button
+                        v-if="(config.config_content?.length ?? 0) <= 1000"
                         icon="pi pi-qrcode"
                         rounded
                         severity="secondary"
@@ -326,7 +327,7 @@ function downloadConfig(config: any) {
 
     const link = document.createElement('a');
     link.href = url;
-    link.download = `${(config.name || 'config').replace(/[^a-zA-Z0-9._-]/g, '_')}.conf`;
+    link.download = `${(config.config_type?.name || 'config').replace(/[^a-zA-Z0-9._-]/g, '_')}_id${config.id}.conf`;
 
     document.body.appendChild(link);
     link.click();

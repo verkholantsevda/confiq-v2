@@ -137,7 +137,7 @@
 
                 <template #content>
 
-                    <div class="qr-block">
+                    <div class="qr-block" v-if="(config?.config_content?.length ?? 0) <= 1000">
 
                         <img
                             v-if="qrCode"
@@ -158,8 +158,22 @@
                             icon="pi pi-download"
                             :label="t('pages.configs_edit.download')"
                             fluid
+                            @click="downloadConfiguration"
                         />
 
+                    </div>
+
+                    <div class="qr-block" v-else>
+                        <p class="qr-text">
+                            Конфигурация слишком большая для удобного сканирования. Скачайте файл и импортируйте его в приложение.
+                        </p>
+
+                        <Button
+                            icon="pi pi-download"
+                            :label="t('pages.configs_edit.download')"
+                            fluid
+                            @click="downloadConfiguration"
+                        />
                     </div>
 
                 </template>
@@ -313,6 +327,11 @@ watchEffect(async () => {
         return;
     }
 
+    if ((config.value.config_content.length ?? 0) > 1000) {
+        qrCode.value = '';
+        return;
+    }
+
     qrCode.value = await QRCode.toDataURL(config.value.config_content, {
         width: 260,
         margin: 1,
@@ -359,7 +378,7 @@ function downloadConfiguration() {
     const link = document.createElement('a');
 
     link.href = url;
-    link.download = `${config.value.name}.conf`;
+    link.download = `${(config.value.config_type?.name || 'config').replace(/[^a-zA-Z0-9._-]/g, '_')}_id${config.value.id}.conf`;
     link.click();
 
     URL.revokeObjectURL(url);
