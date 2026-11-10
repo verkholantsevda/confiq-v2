@@ -141,6 +141,7 @@ func New(userHandler *users.Handler, groupHandler *groups.Handler, endpointHandl
 				})
 
 				r.Get("/all-configs", configHandler.ListAll)
+				r.Post("/configs/move", configHandler.Move)
 			})
 		})
 	})

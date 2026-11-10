@@ -6,6 +6,12 @@ export interface Endpoint {
     port: number;
 
     created_at?: string;
+
+    group_ids?: number[];
+    config_type_ids?: number[];
+    groups?: any[];
+    config_types?: any[];
+    configs?: any[];
 }
 
 export interface CreateEndpointRequest {

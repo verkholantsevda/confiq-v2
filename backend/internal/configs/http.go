@@ -128,3 +128,21 @@ func Delete(w http.ResponseWriter, r *http.Request, service *Service) {
 
 	w.WriteHeader(http.StatusNoContent)
 }
+
+func Move(w http.ResponseWriter, r *http.Request, service *Service) {
+	var req MoveConfigsRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "invalid request", http.StatusBadRequest)
+		return
+	}
+	claims := identity.GetClaims(r)
+	if claims == nil {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+	if err := service.MoveToEndpoint(claims.UserID, claims.IsAdmin, req); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}

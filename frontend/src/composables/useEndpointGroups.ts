@@ -10,6 +10,7 @@ import type { GroupEndpoint } from "@/types/groupEndpoint";
 
 export interface EndpointWithGroups extends Endpoint {
     groups: Group[];
+    configs?: any[];
 }
 
 export function useEndpointGroups() {
@@ -17,7 +18,7 @@ export function useEndpointGroups() {
     const endpoints = ref<EndpointWithGroups[]>([]);
     const loading = ref(false);
 
-    async function load() {
+    async function load(configsData: any[] = []) {
         loading.value = true;
 
         try {
@@ -39,9 +40,12 @@ export function useEndpointGroups() {
                     .map(r => groupsData.find(g => g.id === r.group_id))
                     .filter(Boolean) as Group[];
 
+                const endpointConfigs = configsData.filter((c: any) => c?.endpoint?.id === endpoint.id);
+
                 return {
                     ...endpoint,
                     groups,
+                    configs: endpointConfigs,
                 };
             });
 

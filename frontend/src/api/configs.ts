@@ -46,3 +46,10 @@ export async function deleteConfiguration(id: number) {
         throw error;
     }
 }
+
+export async function moveConfigurations(configIds: number[], endpointId: number) {
+    await api.post("/configs/move", {
+        config_ids: configIds,
+        endpoint_id: endpointId,
+    });
+}

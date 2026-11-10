@@ -35,3 +35,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) {
 	Delete(w, r, h.service)
 }
+
+func (h *Handler) Move(w http.ResponseWriter, r *http.Request) {
+	Move(w, r, h.service)
+}

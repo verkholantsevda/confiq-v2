@@ -1,3 +1,4 @@
 backend/data/*.db
 .env
 AGENTS.md
+.DS_Store

@@ -97,9 +97,10 @@ import MultiSelect from 'primevue/multiselect';
 import Checkbox from 'primevue/checkbox';
 import Button from 'primevue/button';
 
-import { updateEndpoint } from '@/api/endpoints';
+import { updateEndpoint, getEndpoint, getEndpointConfigTypes } from '@/api/endpoints';
 import { getGroups } from '@/api/groups';
 import { getConfigTypes } from '@/api/configTypes';
+import { getGroupsEndpoints } from '@/api/groupsEndpoints';
 const { t } = useI18n({ useScope: 'global' });
 interface Group {
   id: number;
@@ -126,6 +127,7 @@ const loadingConfigTypes = ref(false);
 
 const groups = ref<Group[]>([]);
 const configTypes = ref<ConfigType[]>([]);
+const endpointConfigTypes = ref<number[]>([]);
 
 const form = reactive({
   id: 0,
@@ -155,6 +157,15 @@ const loadGroups = async () => {
   }
 };
 
+const loadEndpointConfigTypes = async (endpointId: number) => {
+  try {
+    const data = await getEndpointConfigTypes(endpointId);
+    endpointConfigTypes.value = data.map((t: any) => t.id);
+  } catch {
+    endpointConfigTypes.value = [];
+  }
+};
+
 const loadConfigTypes = async () => {
   loadingConfigTypes.value = true;
   try {
@@ -171,12 +182,16 @@ watch(
     if (visible && endpoint) {
       loadGroups();
       loadConfigTypes();
+      loadEndpointConfigTypes(endpoint.id);
       form.id = endpoint.id;
       form.name = endpoint.name;
       form.address = endpoint.address;
       form.port = endpoint.port;
       form.group_ids = endpoint.group_ids ?? [];
       form.config_type_ids = endpoint.config_type_ids ?? [];
+      const loadedGroups = endpoint.groups?.map((g: any) => g.id) ?? [];
+      form.group_ids = loadedGroups.length ? loadedGroups : (endpoint.group_ids ?? []);
+      form.config_type_ids = endpointConfigTypes.value.length ? endpointConfigTypes.value : (endpoint.config_type_ids ?? []);
     }
   }
 );

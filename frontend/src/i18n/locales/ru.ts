@@ -10,6 +10,9 @@ export default {
         noData: "Нет данных",
         created: "Создана",
         cancel: "Отмена",
+        confirm: "Подтвердить",
+        select_all: "Выбрать всё",
+        deselect_all: "Снять выделение",
         create: "Создать",
         save: "Сохранить",
     },
@@ -58,6 +61,7 @@ export default {
             port: "Порт",
             configuration_types: "Типы конфигураций",
             groups: "Группы",
+            configs: "Конфигурации",
             name_dialog: "Создать точку подключения",
             name_dialog_edit: "Редактировать точку подключения",
             examples_title: "Примеры адресов",
@@ -74,7 +78,7 @@ export default {
             create: "Создать точку подключения",
             submit: "Применить",
             message_delete: "Вы действительно уверены, что хотите удалить точку подключения?",
-            cant_message_delete: "Это действие нельзя отменить"
+            cant_message_delete: "Это действие нельзя отменить",
         },
         groups: {
             description: "Управление группами",
@@ -211,8 +215,19 @@ export default {
             endpoint: "Выберите точку подключения",
             configtype: "Выберите тип конфигурации",
             create: "Создать конфигурацию"
-        }
-
+        },
+        endpoint_configs: {
+            count: "{count} из {total}",
+            column_user: "Пользователь",
+            column_config: "Конфигурация",
+            column_created: "Дата",
+            delete_selected: "Удалить выбранные",
+            move_selected: "Переместить выбранные",
+            confirm_delete: "Вы действительно хотите удалить выбранные конфигурации? Это действие нельзя отменить.",
+            confirm_move: "Переместить выбранные конфигурации на другой endpoint?",
+            move_to: "Перенести на endpoint",
+            endpoint: "Endpoint",
+        },
     },
     donate: {
         title: "Поддержите развитие проекта",

@@ -9,6 +9,9 @@ export default {
         actions: "Actions",
         noData: "No data",
         cancel: "Cancel",
+        confirm: "Confirm",
+        select_all: "Select all",
+        deselect_all: "Deselect all",
         create: "Create",
         created: "Created",
         save: "Save",
@@ -61,8 +64,8 @@ export default {
             address: "Address",
             port: "Port",
             groups: "Groups",
+            configs: "Configs",
         },
-
         groups: {
             description: "Manage groups",
             create: "Create group",
@@ -154,6 +157,7 @@ export default {
             port: "Port",
             configuration_types: "Configuration Types",        
             groups: "Groups",
+            configs: "Configs",
             name_dialog: "Create endpoint",
             name_dialog_edit: "Edit endpoint",
             examples_title: "Address Examples",
@@ -201,6 +205,18 @@ export default {
             endpoint: "Pick endpoint",
             configtype: "Pick configuration type",
             create: "Create configuration"
+        },
+        endpoint_configs: {
+            count: "{count} of {total}",
+            column_user: "User",
+            column_config: "Configuration",
+            column_created: "Date",
+            delete_selected: "Delete selected",
+            move_selected: "Move selected",
+            confirm_delete: "Are you sure you want to delete the selected configurations? This action cannot be undone.",
+            confirm_move: "Move selected configurations to another endpoint?",
+            move_to: "Move to endpoint",
+            endpoint: "Endpoint",
         },
     },
     donate: {

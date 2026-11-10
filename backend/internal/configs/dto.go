@@ -12,6 +12,11 @@ type UpdateConfigRequest struct {
 	Name string `json:"name"`
 }
 
+type MoveConfigsRequest struct {
+	ConfigIDs  []uint `json:"config_ids"`
+	EndpointID uint   `json:"endpoint_id"`
+}
+
 type EndpointResponse struct {
 	ID      uint   `json:"id"`
 	Name    string `json:"name"`

@@ -68,3 +68,12 @@ func (r *Repository) Update(config *Config) error {
 func (r *Repository) Delete(id uint) error {
 	return r.db.Delete(&Config{}, id).Error
 }
+
+func (r *Repository) MoveToEndpoint(configIDs []uint, endpointID uint) error {
+	if len(configIDs) == 0 {
+		return nil
+	}
+	return r.db.Model(&Config{}).
+		Where("id IN ?", configIDs).
+		Update("endpoint_id", endpointID).Error
+}

@@ -177,6 +177,46 @@ func (s *Service) Update(id uint, actorID uint, isAdmin bool, req UpdateConfigRe
 	return config, nil
 }
 
+func (s *Service) MoveToEndpoint(actorID uint, isAdmin bool, req MoveConfigsRequest) error {
+	if !isAdmin {
+		// only admin can move configs between endpoints
+		return ErrConfigNotFound
+	}
+	endpoint, err := s.endpoints.GetByID(req.EndpointID)
+	if err != nil {
+		return endpoints.ErrEndpointNotFound
+	}
+	for _, id := range req.ConfigIDs {
+		cfg, err := s.repo.GetByID(id)
+		if err != nil {
+			return ErrConfigNotFound
+		}
+		cfg.EndpointID = req.EndpointID
+		cfg.Endpoint = *endpoint
+		if cfg.ConfigType != nil {
+			content, err := warp.Render(
+				cfg.ConfigType.ConfigTemplate,
+				warp.TemplateData{
+					PrivateKey:    cfg.PrivateKey,
+					PublicKey:     cfg.PublicKey,
+					PeerPublicKey: cfg.PeerPublicKey,
+					ClientIPv4:    cfg.ClientIPv4,
+					ClientIPv6:    cfg.ClientIPv6,
+					Endpoint:      endpoint.Address,
+					Port:          endpoint.Port,
+				},
+			)
+			if err == nil {
+				cfg.ConfigContent = content
+			}
+		}
+		if err := s.repo.Update(cfg); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (s *Service) Delete(id uint, actorID uint, isAdmin bool) error {
 	config, err := s.repo.GetByID(id)
 	if err != nil {
