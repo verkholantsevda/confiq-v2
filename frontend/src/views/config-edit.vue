@@ -196,7 +196,7 @@
                             label="Youmoney"
                             icon="pi pi-heart"
                             as="a"
-                            :href="DONATE_YOOMONEY_URL"
+                            :href="donateConfig.yoomoneyUrl"
                             target="_blank"
                             rel="noopener noreferrer"
                         />
@@ -205,7 +205,7 @@
                             icon="pi pi-credit-card"
                             severity="secondary"
                             as="a"
-                            :href="DONATE_CLOUDTIP_URL"
+                            :href="donateConfig.cloudtipUrl"
                             target="_blank"
                             rel="noopener noreferrer"
                         />
@@ -294,6 +294,7 @@ import PageHeader from "@/components/common/PageHeader.vue";
 import type { Configuration } from "@/types/config";
 
 import { useConfigurations } from "@/composables/useConfigs";
+import { useDonate } from "@/composables/useDonate";
 const copied = ref(false);
 const { t } = useI18n({
     useScope: "global",
@@ -314,8 +315,7 @@ const {
     deleteConfiguration,
 } = useConfigurations();
 
-const DONATE_YOOMONEY_URL = import.meta.env.VITE_DONATE_YOOMONEY_URL ?? '#';
-const DONATE_CLOUDTIP_URL = import.meta.env.VITE_DONATE_CLOUDTIP_URL ?? '#';
+const { config: donateConfig } = useDonate();
 
 
 

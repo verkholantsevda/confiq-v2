@@ -9,12 +9,6 @@ RUN npm ci
 
 COPY . .
 
-ARG VITE_DONATE_YOOMONEY_URL
-ARG VITE_DONATE_CLOUDTIP_URL
-
-ENV VITE_DONATE_YOOMONEY_URL=$VITE_DONATE_YOOMONEY_URL
-ENV VITE_DONATE_CLOUDTIP_URL=$VITE_DONATE_CLOUDTIP_URL
-
 RUN npm run build
 
 
@@ -23,10 +17,12 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-RUN npm install -g serve
+RUN apk add --no-cache gettext && \
+    npm install -g serve
 
 COPY --from=builder /app/dist ./dist
+COPY public/config.json.template ./config.json.template
 
 EXPOSE 80
 
-CMD ["serve", "-s", "dist", "-l", "tcp://0.0.0.0:80"]
+CMD sh -c "envsubst '\$DONATE_YOOMONEY_URL \$DONATE_CLOUDTIP_URL' < config.json.template > dist/config.json && exec serve -s dist -l tcp://0.0.0.0:80"

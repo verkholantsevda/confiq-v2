@@ -14,11 +14,11 @@ services:
   frontend:
     env_file:
       - .env
+    environment:
+      - DONATE_YOOMONEY_URL
+      - DONATE_CLOUDTIP_URL
     build:
       context: ./frontend
-      args:
-      - VITE_DONATE_YOOMONEY_URL
-      - VITE_DONATE_CLOUDTIP_URL
     container_name: confiq-frontend
 
     restart: unless-stopped

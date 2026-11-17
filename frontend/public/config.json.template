@@ -1,0 +1,4 @@
+{
+    "yoomoneyUrl": "${DONATE_YOOMONEY_URL}",
+    "cloudtipUrl": "${DONATE_CLOUDTIP_URL}"
+}

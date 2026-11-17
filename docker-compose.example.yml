@@ -14,10 +14,9 @@ services:
     env_file:
       - .env
     image: dverkholantsev/confiq-v2-frontend
-    build:
-      args:
-        - VITE_DONATE_YOOMONEY_URL
-        - VITE_DONATE_CLOUDTIP_URL
+    environment:
+      - DONATE_YOOMONEY_URL
+      - DONATE_CLOUDTIP_URL
     container_name: confiq-frontend
 
     restart: unless-stopped

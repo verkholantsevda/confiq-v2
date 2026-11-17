@@ -44,7 +44,7 @@
                     label="Youmoney"
                     icon="pi pi-heart"
                     as="a"
-                    :href="DONATE_YOOMONEY_URL"
+                    :href="donateConfig.yoomoneyUrl"
                     target="_blank"
                     rel="noopener noreferrer"
                 />
@@ -53,7 +53,7 @@
                     icon="pi pi-credit-card"
                     severity="secondary"
                     as="a"
-                    :href="DONATE_CLOUDTIP_URL"
+                    :href="donateConfig.cloudtipUrl"
                     target="_blank"
                     rel="noopener noreferrer"
                 />
@@ -175,9 +175,9 @@ import ConfigCreateDialog from '@/components/configs/ConfigCreateDialog.vue';
 import Menu from 'primevue/menu';
 import { useConfigsView } from '@/composables/useConfigsView';
 import { deleteConfiguration } from '@/api/configs';
+import { useDonate } from '@/composables/useDonate';
 
-const DONATE_YOOMONEY_URL = import.meta.env.VITE_DONATE_YOOMONEY_URL ?? '#';
-const DONATE_CLOUDTIP_URL = import.meta.env.VITE_DONATE_CLOUDTIP_URL ?? '#';
+const { config: donateConfig } = useDonate();
 
 const { t } = useI18n({
     useScope: "global",
