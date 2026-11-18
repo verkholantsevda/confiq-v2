@@ -73,22 +73,22 @@
                         <div class="action-title">{{ t("pages.configs.create") }}</div>
                     </div>
 
-                    <div class="action-card secondary" @click="dialogs.openGroupCreate()">
+                    <div class="action-card" @click="dialogs.openGroupCreate()">
                         <i class="pi pi-users action-icon" />
                         <i class="pi pi-plus plus-overlay" />
                         <div class="action-title">{{ t("pages.groups.create") }}</div>
                     </div>
 
-                    <div class="action-card secondary" @click="router.push('/admin/configs')">
+                    <div class="action-card" @click="router.push('/admin/configs')">
                         <i class="pi pi-folder-open action-icon" />
                         <div class="action-title">{{ t("menu.configs") }}</div>
                     </div>
 
-                    <div class="action-card secondary" @click="router.push('/admin/users')">
+                    <div class="action-card" @click="router.push('/admin/users')">
                         <i class="pi pi-users action-icon" />
                         <div class="action-title">{{ t("menu.users") }}</div>
                     </div>
-                    <div class="action-card secondary" @click="router.push('/admin/profile')">
+                    <div class="action-card" @click="router.push('/admin/profile')">
                         <i class="pi pi-user action-icon" />
                         <div class="action-title">{{t('user.quickactions.profile')}}</div>
                     </div>
@@ -298,10 +298,6 @@ onMounted(async () => {
     transform: translateY(-3px);
     border-color: var(--p-primary-color);
     box-shadow: var(--p-overlay-modal-shadow);
-}
-
-.action-card.secondary {
-    background: var(--p-surface-ground);
 }
 
 .action-icon {
