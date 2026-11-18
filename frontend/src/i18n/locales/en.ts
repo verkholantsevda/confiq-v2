@@ -201,6 +201,8 @@ export default {
         },
         config: {
             name_dialog: "Create new configuration",
+            edit_title: "Edit configuration",
+            edit_error: "Failed to save configuration",
             name: "Name",
             endpoint: "Pick endpoint",
             configtype: "Pick configuration type",
@@ -245,7 +247,39 @@ export default {
                 new_hint: "Minimum 3 symbols",
                 confirm: "Confirm password",
                 change: "Change password"
-            }
+            },
+            appearance: {
+                title: "Appearance",
+                theme: "Theme",
+                light: "Light",
+                dark: "Dark",
+                accent: "Accent color",
+                accent_hint: "Used for the active menu item, buttons and links",
+                unsaved: "Click Save to apply the changes",
+                custom: "Custom color",
+                accents: {
+                    green: "Green",
+                    blue: "Blue",
+                    violet: "Violet",
+                    orange: "Orange",
+                    rose: "Rose",
+                    cyan: "Cyan",
+                },
+                surface: "Interface background",
+                surface_hint: "Light and dark themes have separate background settings",
+                surfaces: {
+                    white: "White",
+                    cloud: "Cloud",
+                    fog: "Fog",
+                    cream: "Cream",
+                    ice: "Ice",
+                    graphite: "Graphite",
+                    coal: "Coal",
+                    midnight: "Midnight",
+                    charcoal: "Warm dark",
+                    anthracite: "Anthracite",
+                },
+            },
         }
     }
 };

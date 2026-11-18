@@ -1,7 +1,8 @@
 <template>
     <aside class="sidebar">
         <div class="logo">
-            Confiq
+            <img src="/confiq-logo.png" alt="" class="logo-icon" />
+            <span>Confiq</span>
         </div>
         <nav>
             <Button
@@ -80,6 +81,16 @@ function isActive(to: string) {
     padding: 24px;
     font-size: 1.3rem;
     font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+}
+
+.logo-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    flex-shrink: 0;
 }
 
 nav {

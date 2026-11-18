@@ -258,6 +258,41 @@
 
     </div>
 
+    <!-- Диалог редактирования названия -->
+    <Dialog
+        v-model:visible="editDialogVisible"
+        modal
+        :style="{ width: '460px' }"
+        :header="t('dialog.config.edit_title')"
+    >
+        <form class="edit-form" @submit.prevent="saveConfiguration">
+            <div class="field">
+                <label for="edit-name">{{ t("dialog.config.name") }}</label>
+                <InputText
+                    id="edit-name"
+                    v-model="editName"
+                    autofocus
+                    @keyup.enter="saveConfiguration"
+                />
+            </div>
+        </form>
+        <template #footer>
+            <Button
+                :label="t('common.cancel')"
+                text
+                severity="secondary"
+                @click="editDialogVisible = false"
+            />
+            <Button
+                :label="t('common.save')"
+                icon="pi pi-check"
+                :loading="saving"
+                :disabled="!editName.trim() || editName.trim() === config?.name"
+                @click="saveConfiguration"
+            />
+        </template>
+    </Dialog>
+
     <!-- Инструкция -->
     <Card class="instructions">
 
@@ -288,6 +323,8 @@ import QRCode from 'qrcode';
 
 import Card from "primevue/card";
 import Button from "primevue/button";
+import Dialog from "primevue/dialog";
+import InputText from "primevue/inputtext";
 
 import PageHeader from "@/components/common/PageHeader.vue";
 
@@ -302,6 +339,7 @@ const { t } = useI18n({
 const {
     loading,
     loadConfiguration,
+    updateConfiguration,
 } = useConfigurations();
 
 const config = ref<Configuration | null>(null);
@@ -320,6 +358,10 @@ const { config: donateConfig } = useDonate();
 
 
 const qrCode = ref('');
+
+const editDialogVisible = ref(false);
+const editName = ref('');
+const saving = ref(false);
 
 watchEffect(async () => {
     if (!config.value?.config_content) {
@@ -363,7 +405,30 @@ async function removeConfiguration() {
 function editConfiguration() {
     if (!config.value) return;
 
-    router.push(`/configs/${config.value.id}/edit`);
+    editName.value = config.value.name;
+    editDialogVisible.value = true;
+}
+
+async function saveConfiguration() {
+    if (!config.value || saving.value) return;
+
+    const name = editName.value.trim();
+
+    if (!name || name === config.value.name) return;
+
+    saving.value = true;
+
+    try {
+        const currentConfig = config.value;
+        await updateConfiguration(currentConfig.id, { name });
+        currentConfig.name = name;
+        editDialogVisible.value = false;
+    } catch (e: any) {
+        console.error(e);
+        alert(e?.response?.data ?? t("dialog.config.edit_error"));
+    } finally {
+        saving.value = false;
+    }
 }
 
 function downloadConfiguration() {
@@ -568,6 +633,16 @@ async function copyConfiguration() {
     display: flex;
     flex-direction: column;
     gap: .75rem;
+}
+
+.edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: .35rem;
+}
+
+.edit-form label {
+    font-weight: 600;
 }
 
 .instructions {
