@@ -19,6 +19,7 @@ import (
 	"confiq/internal/logger"
 	"confiq/internal/middleware"
 	"confiq/internal/password"
+	"confiq/internal/ratelimit"
 	"confiq/internal/router"
 	"confiq/internal/users"
 	"confiq/internal/warp"
@@ -98,6 +99,7 @@ func main() {
 	}
 	jwtService := auth.NewJWT(cfg.JWTSecret, cfg.JWTExpire)
 	authService := auth.NewService(userService, jwtService, auditService)
+	loginGuard := ratelimit.NewLoginGuard()
 
 	// Handlers
 	userHandler := users.NewHandler(userService)
@@ -105,11 +107,11 @@ func main() {
 	endpointHandler := endpoints.NewHandler(endpointService)
 	configTypeHandler := configtypes.NewHandler(configTypeService)
 	configHandler := configs.NewHandler(configService)
-	authHandler := auth.NewHandler(authService)
+	authHandler := auth.NewHandler(authService, loginGuard, auditService)
 	auditHandler := audit.NewHandler(auditService)
 	backupHandler := backup.NewHandler(backupService)
 
-	authMiddleware := middleware.NewAuth(jwtService)
+	authMiddleware := middleware.NewAuth(jwtService, userService)
 
 	// Router
 	r := router.New(userHandler, groupHandler, endpointHandler, configHandler, configTypeHandler, authHandler, auditHandler, backupHandler, authMiddleware)

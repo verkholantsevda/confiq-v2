@@ -178,6 +178,11 @@ async function onLogin() {
 
         const message = e?.response?.data?.error;
 
+        if (e?.response?.status === 429) {
+            error.value = "Слишком много попыток входа. Попробуйте позже.";
+            return;
+        }
+
         if (message === "totp required") {
             showTotp.value = true;
             error.value = "Введите код из приложения-аутентификатора";

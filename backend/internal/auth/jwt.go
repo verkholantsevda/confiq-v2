@@ -20,13 +20,14 @@ func NewJWT(secret string, expire time.Duration) *JWT {
 	}
 }
 
-func (j *JWT) GenerateToken(userID uint, username string, isAdmin bool) (string, error) {
+func (j *JWT) GenerateToken(userID uint, username string, isAdmin bool, tokenVersion uint) (string, error) {
 	now := time.Now()
 
 	claims := identity.Claims{
-		UserID:   userID,
-		Username: username,
-		IsAdmin:  isAdmin,
+		UserID:       userID,
+		Username:     username,
+		IsAdmin:      isAdmin,
+		TokenVersion: tokenVersion,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Subject:   username,
 			IssuedAt:  jwt.NewNumericDate(now),
@@ -66,4 +67,8 @@ func (j *JWT) ParseToken(tokenString string) (*identity.Claims, error) {
 
 func (j *JWT) ValidateToken(tokenString string) (*identity.Claims, error) {
 	return j.ParseToken(tokenString)
+}
+
+func (j *JWT) ExpiresIn() time.Duration {
+	return j.expire
 }

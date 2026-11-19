@@ -49,7 +49,7 @@ func Load() (*Config, error) {
 		timeout = 30
 	}
 
-	jwtExpire, err := time.ParseDuration(getEnv("JWT_EXPIRE", "24h"))
+	jwtExpire, err := time.ParseDuration(getEnv("JWT_EXPIRE", "2h"))
 	if err != nil {
 		return nil, fmt.Errorf("invalid JWT_EXPIRE: %w", err)
 	}

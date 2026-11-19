@@ -19,4 +19,14 @@ client.interceptors.request.use((config) => {
     return config;
 });
 
+client.interceptors.response.use((response) => {
+    const refreshed = response.headers["x-refresh-token"];
+
+    if (typeof refreshed === "string" && refreshed) {
+        localStorage.setItem("token", refreshed);
+    }
+
+    return response;
+});
+
 export default client;

@@ -57,6 +57,7 @@ func (s *Service) Login(username, plainPassword string, totpCode string) (string
 		user.ID,
 		user.Username,
 		user.IsAdmin,
+		user.TokenVersion,
 	)
 	if err != nil {
 		return "", err

@@ -176,24 +176,37 @@ func (s *Service) UpdateUser(actorID uint, id uint, req UpdateUserRequest) (*Use
 		user.Username = req.Username
 	}
 
+	revokeTokens := false
+
 	if req.Password != "" {
 		hash, err := password.HashPassword(req.Password)
 		if err != nil {
 			return nil, err
 		}
 		user.PasswordHash = hash
+		revokeTokens = true
 	}
 
 	if req.ConfigLimit != nil {
 		user.ConfigLimit = *req.ConfigLimit
 	}
 
+	if req.GroupID != nil && (user.GroupID == nil || *user.GroupID != *req.GroupID) {
+		revokeTokens = true
+	}
 	if req.GroupID != nil {
 		user.GroupID = req.GroupID
 	}
 
+	if req.IsAdmin != nil && user.IsAdmin != *req.IsAdmin {
+		revokeTokens = true
+	}
 	if req.IsAdmin != nil {
 		user.IsAdmin = *req.IsAdmin
+	}
+
+	if revokeTokens {
+		user.TokenVersion++
 	}
 
 	if err := s.repo.Update(user); err != nil {
@@ -259,6 +272,7 @@ func (s *Service) ChangePassword(actorID uint, id uint, currentPassword, newPass
 		return err
 	}
 	user.PasswordHash = hash
+	user.TokenVersion++
 	err = s.repo.Update(user)
 	if err != nil {
 		return err
