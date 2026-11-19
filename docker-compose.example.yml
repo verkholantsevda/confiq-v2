@@ -9,6 +9,7 @@ services:
       - "8089"
     volumes:
       - ./backend/data:/app/data
+      - ./backups:/app/backups
 
   frontend:
     env_file:

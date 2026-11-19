@@ -1,12 +1,15 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"net/http"
+	"time"
 
 	"confiq/internal/audit"
 	"confiq/internal/auth"
+	"confiq/internal/backup"
 	"confiq/internal/config"
 	"confiq/internal/configs"
 	"confiq/internal/configtypes"
@@ -53,6 +56,18 @@ func main() {
 	auditRepo := audit.NewRepository(db)
 	auditService := audit.NewService(auditRepo)
 
+	var shutdown func()
+	backupService, err := backup.NewService(cfg, db, auditService, func() {
+		if shutdown != nil {
+			shutdown()
+		}
+	})
+	if err != nil {
+		slog.Error("failed to initialize backups", "error", err)
+		return
+	}
+	backupService.StartScheduler(context.Background())
+
 	// Services
 	userService := users.NewService(userRepo, cfg, auditService)
 	groupService := groups.NewService(
@@ -92,16 +107,27 @@ func main() {
 	configHandler := configs.NewHandler(configService)
 	authHandler := auth.NewHandler(authService)
 	auditHandler := audit.NewHandler(auditService)
+	backupHandler := backup.NewHandler(backupService)
 
 	authMiddleware := middleware.NewAuth(jwtService)
 
 	// Router
-	r := router.New(userHandler, groupHandler, endpointHandler, configHandler, configTypeHandler, authHandler, auditHandler, authMiddleware)
+	r := router.New(userHandler, groupHandler, endpointHandler, configHandler, configTypeHandler, authHandler, auditHandler, backupHandler, authMiddleware)
 
 	server := &http.Server{
 		Addr:    fmt.Sprintf("%s:%s", cfg.Host, cfg.Port),
 		Handler: r,
 	}
+
+	shutdown = func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		if err := server.Shutdown(ctx); err != nil {
+			slog.Error("graceful shutdown failed", "error", err)
+		}
+	}
+
 	slog.Info(
 		"starting application",
 		"name", cfg.AppName,

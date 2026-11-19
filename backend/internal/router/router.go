@@ -6,6 +6,7 @@ import (
 
 	"confiq/internal/audit"
 	"confiq/internal/auth"
+	"confiq/internal/backup"
 	"confiq/internal/configs"
 	"confiq/internal/configtypes"
 	"confiq/internal/endpoints"
@@ -18,7 +19,7 @@ import (
 	"github.com/go-chi/cors"
 )
 
-func New(userHandler *users.Handler, groupHandler *groups.Handler, endpointHandler *endpoints.Handler, configHandler *configs.Handler, configTypeHandler *configtypes.Handler, authHandler *auth.Handler, auditHandler *audit.Handler, authMiddleware *authmw.Auth) http.Handler {
+func New(userHandler *users.Handler, groupHandler *groups.Handler, endpointHandler *endpoints.Handler, configHandler *configs.Handler, configTypeHandler *configtypes.Handler, authHandler *auth.Handler, auditHandler *audit.Handler, backupHandler *backup.Handler, authMiddleware *authmw.Auth) http.Handler {
 	r := chi.NewRouter()
 
 	r.Use(chimiddleware.RequestID)
@@ -102,6 +103,15 @@ func New(userHandler *users.Handler, groupHandler *groups.Handler, endpointHandl
 				r.Use(authMiddleware.RequireAdmin)
 
 				r.Get("/activity", auditHandler.List)
+
+				r.Route("/backups", func(r chi.Router) {
+					r.Get("/", backupHandler.List)
+					r.Post("/", backupHandler.Create)
+					r.Get("/{name}/download", backupHandler.Download)
+					r.Post("/{name}/restore", backupHandler.RestoreExisting)
+					r.Delete("/{name}", backupHandler.Delete)
+					r.Post("/restore", backupHandler.Restore)
+				})
 
 				r.Route("/users", func(r chi.Router) {
 					r.Get("/", userHandler.List)

@@ -20,6 +20,12 @@ type Config struct {
 
 	DatabasePath string
 
+	BackupDir             string
+	BackupEnabled         bool
+	BackupInterval        time.Duration
+	BackupKeep            int
+	BackupSafetyOnRestore bool
+
 	JWTSecret string
 	JWTExpire time.Duration
 
@@ -48,6 +54,16 @@ func Load() (*Config, error) {
 		return nil, fmt.Errorf("invalid JWT_EXPIRE: %w", err)
 	}
 
+	backupInterval, err := time.ParseDuration(getEnv("BACKUP_INTERVAL", "24h"))
+	if err != nil || backupInterval <= 0 {
+		return nil, fmt.Errorf("invalid BACKUP_INTERVAL")
+	}
+
+	backupKeep, err := strconv.Atoi(getEnv("BACKUP_KEEP", "7"))
+	if err != nil || backupKeep < 0 {
+		backupKeep = 7
+	}
+
 	cfg := &Config{
 		AppName:       getEnv("APP_NAME", "Confiq"),
 		AppVersion:    getEnv("APP_VERSION", "0.1.0"),
@@ -58,6 +74,12 @@ func Load() (*Config, error) {
 		Port:          getEnv("PORT", "8080"),
 
 		DatabasePath: getEnv("DATABASE_PATH", "data/confiq.db"),
+
+		BackupDir:             getEnv("BACKUP_DIR", "data/backups"),
+		BackupEnabled:         getEnv("BACKUP_ENABLED", "true") == "true",
+		BackupInterval:        backupInterval,
+		BackupKeep:            backupKeep,
+		BackupSafetyOnRestore: getEnv("BACKUP_SAFETY_ON_RESTORE", "true") == "true",
 
 		JWTSecret: getEnv("JWT_SECRET", ""),
 		JWTExpire: jwtExpire,

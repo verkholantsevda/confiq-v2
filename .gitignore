@@ -1,4 +1,8 @@
 backend/data/*.db
+backend/data/backups/
+backups/
 .env
 AGENTS.md
+FEATURE.md
+SECURITY.md
 .DS_Store

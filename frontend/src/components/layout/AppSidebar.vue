@@ -43,6 +43,7 @@ const adminMenu = [
     { key: "groups", icon: "pi pi-sitemap", to: "/admin/groups" },
     { key: "configtypes", icon: "pi pi-tags", to: "/admin/config-types" },
     { key: "configs", icon: "pi pi-file", to: "/admin/configs" },
+    { key: "backups", icon: "pi pi-database", to: "/admin/backups" },
 ];
 
 const userMenu = [

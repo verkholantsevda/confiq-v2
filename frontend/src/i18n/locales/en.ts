@@ -31,6 +31,7 @@ export default {
         groups: "Groups",
         configtypes: "Configuration Types",
         configs: "Configurations",
+        backups: "Backups",
         settings: "Settings"
     },
 
@@ -96,6 +97,23 @@ export default {
             total: "Total",
             used: "Used",
             available: "Available",
+        },
+        backups: {
+            description: "Back up and restore the database",
+            create: "Create backup",
+            restore: "Restore",
+            restoreFromBackup: "Restore from this backup",
+            empty: "No backups yet",
+            name: "File",
+            size: "Size",
+            deleteTitle: "Delete backup",
+            deleteConfirm: "Delete the selected backup file?",
+            restoreTitle: "Database restore",
+            restoreConfirm: "Restore the database from {name}?",
+            restoreWarning: "The current database will be saved separately. The server will restart after the restore.",
+            resultTitle: "Restore",
+            restoreSuccess: "The database has been restored. The server is restarting — refresh the page in a few seconds.",
+            restoreFailed: "Failed to restore the database. Make sure you selected a valid backup file.",
         },
         configs_edit: {
             endpoint: "Endpoint",
